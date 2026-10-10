@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { CASINOS } from '@/lib/casinos';
 import { SITE } from '@/lib/site';
 import { ExternalIcon } from './icons';
+import { Socials } from './Socials';
 
 /**
  * The top bar. Transparent over the hero, opaque once the page has moved. The
@@ -48,6 +49,8 @@ export function SiteNav() {
             </a>
           ))}
         </nav>
+
+        <Socials compact />
 
         <a className="btn btn-primary nav-cta" href={CASINOS.rain.signupUrl} target="_blank" rel="noreferrer">
           Join Rain.gg

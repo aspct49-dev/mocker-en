@@ -65,7 +65,7 @@ export default async function RainLeaderboardPage() {
       </section>
 
       <section className="section wrap" aria-labelledby="standings-h">
-        <div className="section-head">
+        <div className="section-head" data-reveal>
           <h2 className="h2" id="standings-h">
             Standings
           </h2>
@@ -75,7 +75,7 @@ export default async function RainLeaderboardPage() {
         <Board board={board} casino={casino} />
 
         {board.stats.players > 0 && (
-          <p className="board-total">
+          <p className="board-total" data-reveal>
             {board.stats.players.toLocaleString('en-US')} players have wagered{' '}
             <Coin casino={casino} amount={board.stats.totalWagered} /> this race.
           </p>
@@ -83,7 +83,7 @@ export default async function RainLeaderboardPage() {
       </section>
 
       <section className="section wrap" id="how" aria-labelledby="how-h">
-        <div className="section-head">
+        <div className="section-head" data-reveal>
           <h2 className="h2" id="how-h">
             How it works
           </h2>
@@ -93,7 +93,7 @@ export default async function RainLeaderboardPage() {
         </div>
         <ol className="steps">
           {JOIN_STEPS.map((step) => (
-            <li className="step" key={step.n}>
+            <li className="step" key={step.n} data-reveal style={{ ['--i' as string]: step.n - 1 }}>
               <span className="step-n" aria-hidden>
                 {step.n}
               </span>
@@ -102,7 +102,7 @@ export default async function RainLeaderboardPage() {
             </li>
           ))}
         </ol>
-        <div className="steps-cta">
+        <div className="steps-cta" data-reveal>
           <a className="btn btn-primary" href={casino.signupUrl} target="_blank" rel="noreferrer">
             Sign up with code {casino.code}
             <ExternalIcon />
@@ -111,7 +111,7 @@ export default async function RainLeaderboardPage() {
       </section>
 
       <section className="section wrap" id="rules" aria-labelledby="rules-h">
-        <div className="section-head">
+        <div className="section-head" data-reveal>
           <h2 className="h2" id="rules-h">
             Rules
           </h2>
@@ -121,8 +121,8 @@ export default async function RainLeaderboardPage() {
           </p>
         </div>
         <ul className="rules">
-          {RULES.map((rule) => (
-            <li className="rule" key={rule.title}>
+          {RULES.map((rule, i) => (
+            <li className="rule" key={rule.title} data-reveal style={{ ['--i' as string]: i }}>
               <h3 className="rule-title">{rule.title}</h3>
               <p className="rule-body">{rule.body}</p>
             </li>

@@ -46,7 +46,11 @@ export function Countdown({ endsAt }: { endsAt: string }) {
           <div className="cd-group" key={unit}>
             {i > 0 && <span className="cd-sep">:</span>}
             <div className="cd-cell">
-              <span className="cd-num">{left === null ? '--' : String(value).padStart(2, '0')}</span>
+              {/* Keyed on the value, so each change remounts the figure and
+                  replays its roll-in. */}
+              <span className="cd-num" key={left === null ? 'idle' : value}>
+                {left === null ? '--' : String(value).padStart(2, '0')}
+              </span>
               <span className="cd-unit">{unit}</span>
             </div>
           </div>

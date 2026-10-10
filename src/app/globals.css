@@ -272,6 +272,48 @@ p {
   border-radius: 50%;
   background: var(--green);
 }
+/* ---------- Socials ---------- */
+
+.socials {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.social {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid var(--edge);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.social:hover {
+  border-color: var(--edge-lit);
+  background: var(--hull);
+  color: var(--text);
+}
+.social[data-platform='kick']:hover {
+  color: #53fc18;
+}
+.social-handle {
+  color: var(--dim);
+  font-weight: 500;
+}
+.socials-compact .social {
+  width: 42px;
+  padding: 0;
+  justify-content: center;
+}
+
 .nav-cta {
   min-height: 42px;
   padding: 0 16px;
@@ -282,12 +324,23 @@ p {
   .nav-links {
     display: none;
   }
+  .nav-inner .socials {
+    margin-left: auto;
+  }
   .nav-inner {
     justify-content: space-between;
     height: 64px;
   }
   .nav-brand img {
     height: 32px;
+  }
+}
+
+/* The top bar keeps the brand and the way in on a phone; the socials are
+   one scroll away in the footer. */
+@media (max-width: 520px) {
+  .nav-inner .socials {
+    display: none;
   }
 }
 

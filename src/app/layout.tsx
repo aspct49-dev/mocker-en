@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from 'next';
 import { Chakra_Petch, Russo_One } from 'next/font/google';
 
+import { Reveal } from '@/components/Reveal';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteNav } from '@/components/SiteNav';
 import { SITE } from '@/lib/site';
 import './globals.css';
 import './leaderboard.css';
 import './bonuses.css';
+import './motion.css';
 
 /* Russo One for display: heavy, squared and slightly condensed, the closest
    Google face to the wordmark's varsity block letters. Chakra Petch for
@@ -59,6 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteNav />
         <main id="main">{children}</main>
         <SiteFooter />
+        <Reveal />
       </body>
     </html>
   );

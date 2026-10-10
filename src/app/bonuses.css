@@ -194,6 +194,11 @@
 .offer-note b {
   color: var(--text);
 }
+.offer-note a {
+  color: var(--accent);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
 
 @media (max-width: 760px) {
   .offers {

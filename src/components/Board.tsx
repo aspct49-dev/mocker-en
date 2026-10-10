@@ -22,8 +22,15 @@ export function Board({ board, casino }: { board: Leaderboard; casino: Casino })
         <span role="columnheader">Prize</span>
       </div>
 
-      {rows.map((entry) => (
-        <div className="board-row" role="row" key={entry.rank} data-open={entry.unclaimed || undefined}>
+      {rows.map((entry, i) => (
+        <div
+          className="board-row"
+          role="row"
+          key={entry.rank}
+          data-open={entry.unclaimed || undefined}
+          data-reveal
+          style={{ ['--i' as string]: i }}
+        >
           <span className="board-rank" role="cell">
             {entry.rank}
           </span>

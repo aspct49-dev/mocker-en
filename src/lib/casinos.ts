@@ -93,7 +93,7 @@ export const BONUSES: Bonus[] = [
     amount: '10–20%',
     amountSuffix: 'Deposit bonus',
     features: ['10–20% deposit bonus, based on your deposit', '3 free cases', 'Leaderboard access'],
-    note: 'Contact us for more info.',
+    contact: true,
   },
   {
     casino: 'gamdom',

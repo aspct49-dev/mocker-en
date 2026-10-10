@@ -1,4 +1,5 @@
 import { SITE } from '@/lib/site';
+import { Socials } from './Socials';
 
 export function SiteFooter() {
   return (
@@ -6,6 +7,8 @@ export function SiteFooter() {
       <div className="wrap foot-inner">
         {/* eslint-disable-next-line @next/next/no-img-element -- the wordmark is the logo */}
         <img className="foot-mark" src="/mocker-wordmark.webp" alt={SITE.name} width="1200" height="357" />
+
+        <Socials />
 
         <p className="foot-age">
           <span className="foot-18">18+</span>

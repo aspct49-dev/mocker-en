@@ -1,0 +1,203 @@
+/*
+ * Motion. Imported last, so it layers over the static styles without them
+ * knowing about it.
+ *
+ * One curve for nearly everything — an exponential ease-out, fast off the
+ * mark and long to settle, which is what reads as smooth rather than as
+ * animated. Only opacity and transforms move, so nothing triggers layout.
+ *
+ * Load animations use `backwards` fill, never `both`: a finished animation
+ * holding its end state would pin `translate` and silently kill every hover
+ * lift that uses it.
+ *
+ * All of it is switched off under prefers-reduced-motion (globals.css, and
+ * the view-transition rule at the foot of this file).
+ */
+
+:root {
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --rise: 900ms;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- Leaderboard: load sequence ---------- */
+
+.hero-partner,
+.hero-title,
+.hero-lede,
+.hero-actions,
+.switch,
+.hero-unit,
+.cd {
+  animation: rise var(--rise) var(--ease-expo) backwards;
+}
+.hero-title {
+  animation-delay: 60ms;
+}
+.hero-lede {
+  animation-delay: 130ms;
+}
+.hero-actions {
+  animation-delay: 190ms;
+}
+.switch {
+  animation-delay: 250ms;
+}
+.hero-unit {
+  animation-delay: 290ms;
+}
+
+/* First place lands first, then the two either side of it. */
+.pod {
+  animation: rise 1000ms var(--ease-expo) backwards;
+}
+.pod[data-place='1'] {
+  animation-delay: 340ms;
+}
+.pod[data-place='2'] {
+  animation-delay: 430ms;
+}
+.pod[data-place='3'] {
+  animation-delay: 490ms;
+}
+.flank {
+  animation: fade 1400ms ease-out 620ms backwards;
+}
+.cd {
+  animation-delay: 560ms;
+}
+
+/* ---------- Bonuses: load sequence ---------- */
+
+.offers-title,
+.offers-lede,
+.offer {
+  animation: rise var(--rise) var(--ease-expo) backwards;
+}
+.offers-lede {
+  animation-delay: 80ms;
+}
+.offer:nth-child(1) {
+  animation-delay: 170ms;
+}
+.offer:nth-child(2) {
+  animation-delay: 250ms;
+}
+.offer:nth-child(3) {
+  animation-delay: 330ms;
+}
+
+/* ---------- Scroll reveals (components/Reveal.tsx) ---------- */
+
+/*
+ * Hidden only once the script has run, so the page is whole without it.
+ * Things already on screen at that moment are marked `instant` and never
+ * animate; only what scrolls in rises, staggered by its `--i`.
+ */
+html.reveal-ready [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+}
+html.reveal-ready [data-reveal][data-revealed='scroll'] {
+  animation: rise 800ms var(--ease-expo) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+/* ---------- Countdown ---------- */
+
+/* Each figure rolls down into place when it changes; the cell clips it. */
+.cd-cell {
+  overflow: hidden;
+}
+.cd-num {
+  display: block;
+  animation: cd-roll 520ms var(--ease-expo) backwards;
+}
+@keyframes cd-roll {
+  from {
+    opacity: 0;
+    translate: 0 -45%;
+  }
+}
+
+/* ---------- Interaction ---------- */
+
+/* Press: a small give under the pointer, on everything that is a button. */
+.btn,
+.code,
+.social {
+  transition-property: transform, scale, background-color, border-color, color, box-shadow;
+  transition-duration: 280ms;
+  transition-timing-function: var(--ease-expo);
+}
+.btn:active,
+.code:active,
+.social:active {
+  scale: 0.97;
+  transition-duration: 90ms;
+}
+
+.pod-card {
+  transition: translate 600ms var(--ease-expo);
+}
+.pod-card:hover {
+  translate: 0 -6px;
+}
+
+.offer {
+  transition:
+    translate 600ms var(--ease-expo),
+    border-color 300ms var(--ease-expo),
+    box-shadow 600ms var(--ease-expo);
+}
+
+.board-row {
+  transition:
+    background-color 240ms var(--ease-expo),
+    border-color 240ms var(--ease-expo);
+}
+
+/* ---------- Page to page ---------- */
+
+/*
+ * A soft cross-fade between the leaderboard and the bonuses page, from the
+ * browser's own view transitions. Browsers without them navigate as before.
+ */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root) {
+  animation: 180ms ease-out both vt-out;
+}
+::view-transition-new(root) {
+  animation: 420ms var(--ease-expo) both vt-in;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

@@ -64,6 +64,12 @@ with the race on Rain.
 Usernames are masked (`D*****K`) in `providers/shared.ts`, so a new provider
 cannot forget to.
 
+## Socials
+
+Kick and X are `SOCIALS` in `src/lib/site.ts`; the top bar (icons) and the
+footer (with handles) both read it, and "Contact us" on the Rain bonus card
+links to X.
+
 ## Gamdom
 
 `board` on each entry in `src/lib/casinos.ts` says where that casino's board
@@ -122,7 +128,12 @@ keyline, and depth comes from neutral shadows, not coloured halos. The one
 lit dot is the live-feed indicator. Keep it that way: a coloured glow under
 every button is the fastest way to make this look like a template.
 
-Motion is limited to hover feedback, switched off under
+Motion lives in `motion.css`, imported last: a staggered load sequence on
+each page, scroll reveals for anything marked `data-reveal`
+(`components/Reveal.tsx`, which never hides what is already on screen), a
+rolling countdown, a cross-fade between pages via the browser's view
+transitions, and a press-and-lift on buttons and cards. One exponential
+ease-out throughout; only opacity and transforms move. All of it is off under
 `prefers-reduced-motion`. All text tokens clear WCAG AA on every ground they
 sit on (lowest: `--dim` on `--hull-2`, 5.48:1).
 
@@ -140,6 +151,7 @@ src/
     globals.css      tokens, buttons, nav, footer
     leaderboard.css  hero, switcher, podium, countdown, standings, steps, rules
     bonuses.css      the offer cards on /bonuses
+    motion.css       load sequences, scroll reveals, transitions
     icon.svg         favicon (Rain star)
     robots.ts        robots.txt, generated
     sitemap.ts       sitemap.xml, generated

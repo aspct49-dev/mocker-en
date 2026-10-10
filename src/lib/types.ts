@@ -81,6 +81,6 @@ export interface Bonus {
   amount: string;
   amountSuffix: string;
   features: string[];
-  /** Small print under the button, after "Sign up with code …". */
-  note?: string;
+  /** Whether the small print under the button adds "Contact us for more info". */
+  contact?: boolean;
 }

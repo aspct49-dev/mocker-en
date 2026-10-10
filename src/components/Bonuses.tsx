@@ -1,4 +1,5 @@
 import { BONUSES, getCasino } from '@/lib/casinos';
+import { SOCIALS } from '@/lib/site';
 import type { Bonus } from '@/lib/types';
 import { CheckIcon, ExternalIcon } from './icons';
 
@@ -20,6 +21,9 @@ export function Bonuses() {
     </div>
   );
 }
+
+/** Where "Contact us" goes: DMs on X. */
+const X_URL = SOCIALS.find((s) => s.id === 'x')!.href;
 
 function OfferCard({ bonus }: { bonus: Bonus }) {
   const casino = getCasino(bonus.casino);
@@ -70,7 +74,16 @@ function OfferCard({ bonus }: { bonus: Bonus }) {
       </a>
 
       <p className="offer-note">
-        Sign up with code <b>{casino.code}</b>.{bonus.note && ` ${bonus.note}`}
+        Sign up with code <b>{casino.code}</b>.
+        {bonus.contact && (
+          <>
+            {' '}
+            <a href={X_URL} target="_blank" rel="noreferrer">
+              Contact us
+            </a>{' '}
+            for more info.
+          </>
+        )}
       </p>
     </article>
   );
