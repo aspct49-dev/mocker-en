@@ -23,8 +23,8 @@ export const CASINOS: Record<CasinoId, Casino> = {
   gamdom: {
     id: 'gamdom',
     name: 'Gamdom',
-    code: 'Mocker',
-    signupUrl: 'https://gamdom.com',
+    code: 'mocker',
+    signupUrl: 'https://gamdom.com/r/mocker',
     logo: '/gamdom-logo.png',
     logoSize: [232, 54],
     unit: { name: 'dollars', icon: '' },
