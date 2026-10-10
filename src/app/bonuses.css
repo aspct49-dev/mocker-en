@@ -1,0 +1,203 @@
+/*
+ * /bonuses — the offer cards.
+ *
+ * Each card sets `--accent` (its casino's own colour) and `--accent-ink` (text
+ * on it); everything lit on a card reads those, so a third casino is one entry
+ * in `BONUSES` and no CSS here.
+ */
+
+.offers-page {
+  padding-top: clamp(32px, 5vw, 56px);
+}
+
+.offers-head {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+}
+/* Same lettering as the leaderboard title: the wordmark's white-to-silver
+   split with a dark green keyline. */
+.offers-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(44px, 7vw, 72px);
+  line-height: 1;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #ffffff 0%, #ffffff 48%, #c9d4d4 52%, #e6eded 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 0 var(--green-dark));
+}
+.offers-lede {
+  max-width: 52ch;
+  text-wrap: balance;
+  color: var(--muted);
+  font-size: 17px;
+}
+.offers-lede b {
+  color: var(--text);
+}
+.offers-lit {
+  color: var(--green-hi);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+/* ---------- Cards ---------- */
+
+.offers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  width: min(920px, 100%);
+  margin: clamp(32px, 5vw, 48px) auto 0;
+}
+
+.offer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 26px 26px 22px;
+  border: 1px solid var(--edge);
+  border-top: 2px solid var(--accent);
+  border-radius: 16px;
+  background: var(--hull);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  transition:
+    border-color 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out),
+    translate 180ms var(--ease-out);
+}
+@media (hover: hover) {
+  .offer:hover {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--edge));
+    border-top-color: var(--accent);
+    box-shadow: 0 24px 56px rgba(0, 0, 0, 0.4);
+    translate: 0 -4px;
+  }
+}
+
+.offer-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88px;
+  margin: 0;
+}
+.offer-logo {
+  height: 38px;
+  width: auto;
+  max-width: 240px;
+}
+.offer-logo[data-casino='gamdom'] {
+  height: 44px;
+}
+
+/* The bonus itself, inset. */
+.offer-box {
+  flex: 1;
+  width: 100%;
+  margin-top: 8px;
+  padding: 20px 20px 18px;
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  background: var(--ground);
+}
+.offer-box-label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--dim);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.offer-amount {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px 10px;
+  margin-bottom: 18px;
+  line-height: 1;
+}
+.offer-amount-value {
+  font-family: var(--font-display);
+  font-size: 44px;
+  color: var(--text);
+}
+.offer-amount-suffix {
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.offer-features {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.offer-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.offer-tick {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+}
+.offer-tick svg {
+  width: 11px;
+  height: 11px;
+}
+
+.offer-cta {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 18px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.offer-cta:hover {
+  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--accent) 85%, #ffffff);
+}
+
+.offer-note {
+  margin-top: 12px;
+  color: var(--dim);
+  font-size: 13px;
+}
+.offer-note b {
+  color: var(--text);
+}
+
+@media (max-width: 760px) {
+  .offers {
+    grid-template-columns: 1fr;
+    width: min(460px, 100%);
+  }
+}

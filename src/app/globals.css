@@ -1,0 +1,381 @@
+/*
+ * Design tokens, base, and the furniture every page shares: buttons, the top
+ * bar, the footer, notices.
+ *
+ * Palette, from the two sources that own it:
+ *   - the wordmark — black ground, a green ribbon running from #004010 in the
+ *     shadow to #10F090 at the lit edge, silver-white letters;
+ *   - Rain's art — the same greens in the smoke, gold #F7B016 in the sparks
+ *     and the coin.
+ * Green is the brand and the only interface accent. Gold belongs to Rain and
+ * is spent on coins, prizes and first place, nowhere else.
+ */
+
+:root {
+  --void: #040806;
+  --ground: #06100a;
+  --hull: #0a1810;
+  --hull-2: #0f2217;
+  --edge: #1a3423;
+  --edge-lit: #2b5a3b;
+
+  --text: #eef5f0;
+  --muted: #a7bbae;
+  --dim: #84998b;
+
+  --green: #22d16b;
+  --green-hi: #4cf29a;
+  --green-deep: #00a040;
+  --green-dark: #004d1f;
+  --green-ink: #03140a;
+
+  --gold: #f7b016;
+  --silver: #c8d2d9;
+  --bronze: #d9873e;
+
+  --radius: 12px;
+  --wrap: 1180px;
+  --gutter: clamp(16px, 4vw, 32px);
+
+  --font-display: var(--font-display-face), 'Arial Black', sans-serif;
+  --font-sans: var(--font-sans-face), system-ui, sans-serif;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: clip;
+  background-color: var(--void);
+  background-image:
+    radial-gradient(70% 520px at 50% -80px, rgba(0, 160, 64, 0.24), transparent 70%),
+    radial-gradient(40% 380px at 50% 420px, rgba(247, 176, 22, 0.05), transparent 70%);
+  background-repeat: no-repeat;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--green-hi);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip {
+  position: absolute;
+  left: 16px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--green);
+  color: var(--green-ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+.skip:focus {
+  top: 12px;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 20px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font: 700 15px/1 var(--font-sans);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease-out),
+    box-shadow 200ms var(--ease-out),
+    background-color 200ms var(--ease-out);
+}
+
+.btn-primary {
+  background: var(--green);
+  color: var(--green-ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.btn-primary:hover {
+  background: var(--green-hi);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ---------- Copy code ---------- */
+
+.code {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 0 8px 0 16px;
+  border-radius: 10px;
+  border: 1px dashed var(--edge-lit);
+  background: rgba(10, 24, 16, 0.8);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 200ms var(--ease-out), background-color 200ms var(--ease-out);
+}
+.code:hover {
+  border-color: var(--green);
+  background: var(--hull-2);
+}
+.code-key {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.code-val {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+}
+.code-state {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  background: var(--hull-2);
+  color: var(--muted);
+  transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out);
+}
+.code-state[data-copied] {
+  background: var(--green);
+  color: var(--green-ink);
+}
+
+/* ---------- Top bar ---------- */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid transparent;
+  transition: background-color 240ms var(--ease-out), border-color 240ms var(--ease-out);
+}
+.nav[data-stuck] {
+  background: rgba(4, 8, 6, 0.86);
+  backdrop-filter: blur(12px);
+  border-bottom-color: var(--edge);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 72px;
+}
+.nav-brand img {
+  height: 40px;
+  width: auto;
+}
+.nav-links {
+  display: flex;
+  gap: 4px;
+  margin: 0 auto;
+}
+.nav-links a {
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 160ms var(--ease-out), background-color 160ms var(--ease-out);
+}
+.nav-links a:hover {
+  color: var(--text);
+  background: var(--hull);
+}
+/* The page you are on: lit, with a green dot under it. */
+.nav-links a[aria-current='page'] {
+  position: relative;
+  color: var(--text);
+}
+.nav-links a[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: 5px;
+  height: 5px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: var(--green);
+}
+.nav-cta {
+  min-height: 42px;
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+@media (max-width: 820px) {
+  .nav-links {
+    display: none;
+  }
+  .nav-inner {
+    justify-content: space-between;
+    height: 64px;
+  }
+  .nav-brand img {
+    height: 32px;
+  }
+}
+
+/* ---------- Notice ---------- */
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 640px;
+  margin: 0 auto 28px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(247, 176, 22, 0.35);
+  background: rgba(247, 176, 22, 0.08);
+  color: var(--text);
+  font-size: 14px;
+  text-align: left;
+}
+.notice-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #1a1000;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* ---------- Footer ---------- */
+
+.foot {
+  margin-top: 96px;
+  border-top: 1px solid var(--edge);
+  background: linear-gradient(180deg, var(--ground), var(--void));
+}
+.foot-inner {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  padding-top: 48px;
+  padding-bottom: 40px;
+  text-align: center;
+}
+.foot-mark {
+  height: 56px;
+  width: auto;
+  margin-bottom: 8px;
+}
+.foot-age,
+.foot-note {
+  max-width: 640px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.foot-age a {
+  color: var(--green-hi);
+}
+.foot-18 {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 22px;
+  margin-right: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--dim);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  vertical-align: 1px;
+}
+.foot-copy {
+  color: var(--dim);
+  font-size: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
