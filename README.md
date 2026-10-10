@@ -152,7 +152,8 @@ src/
     leaderboard.css  hero, switcher, podium, countdown, standings, steps, rules
     bonuses.css      the offer cards on /bonuses
     motion.css       load sequences, scroll reveals, transitions
-    icon.svg         favicon (Rain star)
+    icon.svg         favicon: a blocky M in the brand green
+    apple-icon.png   180px home-screen icon, same M, full-bleed
     robots.ts        robots.txt, generated
     sitemap.ts       sitemap.xml, generated
   components/        Podium, Board, CasinoSwitch, Countdown, CopyCode, …
