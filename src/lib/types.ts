@@ -4,7 +4,7 @@
  * from.
  */
 
-export type CasinoId = 'rain' | 'gamdom';
+export type CasinoId = 'rain' | 'csgobig' | 'gamdom';
 
 export interface Casino {
   id: CasinoId;
@@ -28,10 +28,26 @@ export interface Casino {
    */
   board: { at: 'here' } | { at: 'external'; url: string } | { at: 'soon' };
   /**
-   * The payout table used only when the operator's own one cannot be read.
-   * For Rain the live race carries its own distribution and that wins.
+   * The payout table. For Rain it is only the fallback — the live race
+   * carries its own distribution and that wins. For a race defined here
+   * (CSGOBig) it is the prize table itself.
    */
   fallbackPrizes: number[];
+  /**
+   * A race window set on this site rather than by the operator, as ISO
+   * instants. Rain's comes from Rain, so it has none.
+   */
+  period?: { start: string; end: string };
+  /** Brand colour for coin figures on this casino's board. */
+  coinColor?: string;
+  /** Which coin art flanks the podium: Rain's drawn coin, or the CSGOBig chip. */
+  flank?: 'rain' | 'big';
+  /** "How it works", in order. */
+  steps?: { title: string; body: string }[];
+  /** The rules shown under the board. */
+  rules?: { title: string; body: string }[];
+  /** One line under the Rules heading after the prize sentence. */
+  clockNote?: string;
 }
 
 export interface LeaderboardEntry {

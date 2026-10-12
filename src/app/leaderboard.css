@@ -95,7 +95,7 @@
   font-weight: 500;
 }
 .hero-pool {
-  color: var(--gold);
+  color: var(--coin, var(--gold));
   font-weight: 700;
 }
 
@@ -194,6 +194,19 @@ a.switch-tab:hover {
    read at the same weight as Rain's wordmark. */
 .switch-logo[data-casino='gamdom'] {
   height: 26px;
+}
+/* Three tabs on a phone: the marks shrink so each fits its third. */
+@media (max-width: 520px) {
+  .switch-tab {
+    padding: 10px 6px;
+    gap: 4px;
+  }
+  .switch-logo {
+    height: 15px;
+  }
+  .switch-logo[data-casino='gamdom'] {
+    height: 18px;
+  }
 }
 .switch-tab[aria-current='page'] .switch-logo,
 a.switch-tab:hover .switch-logo {
@@ -457,12 +470,22 @@ a.switch-tab:hover .switch-ext {
   position: absolute;
   inset: -12% -20% -8% -10%;
   background:
-    radial-gradient(42% 30% at 62% 46%, rgba(247, 176, 22, 0.08), transparent 72%);
+    radial-gradient(
+      42% 30% at 62% 46%,
+      color-mix(in srgb, var(--coin, var(--gold)) 8%, transparent),
+      transparent 72%
+    );
 }
 
 .flank-coin {
   position: absolute;
   height: auto;
+}
+/* CSGOBig's chip has a near-black face; a thin ring of its own gold keeps it
+   from sinking into the page. */
+.flank[data-variant='big'] .flank-coin {
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--coin, var(--gold)) 35%, transparent);
 }
 /* Near: large, sharp, half behind the card. */
 .flank-coin-near {
@@ -483,7 +506,7 @@ a.switch-tab:hover .switch-ext {
 
 .flank-star {
   position: absolute;
-  color: var(--gold);
+  color: var(--coin, var(--gold));
 }
 .flank-star-lit {
   width: 22cqi;
@@ -502,7 +525,7 @@ a.switch-tab:hover .switch-ext {
   height: 1cqi;
   min-height: 2px;
   border-radius: 999px;
-  background: #ffc23d;
+  background: color-mix(in srgb, var(--coin, var(--gold)) 80%, #ffffff);
 }
 
 /* Left: a lit star over the card's top corner, the near coin tucked under
@@ -772,7 +795,7 @@ a.switch-tab:hover .switch-ext {
   font-weight: 600;
 }
 .board-prize {
-  color: var(--gold);
+  color: var(--coin, var(--gold));
   font-weight: 700;
 }
 .board-dash {

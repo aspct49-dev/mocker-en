@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { CASINO_ORDER, CASINOS } from '@/lib/casinos';
+import { boardPath, CASINO_ORDER, CASINOS } from '@/lib/casinos';
 import type { Casino, CasinoId } from '@/lib/types';
 import { ExternalIcon, LockIcon } from './icons';
 
@@ -36,7 +36,7 @@ export function CasinoSwitch({ active }: { active: CasinoId }) {
           return (
             <Link
               key={id}
-              href={id === 'rain' ? '/' : `/${id}`}
+              href={boardPath(id)}
               className="switch-tab"
               aria-current={id === active ? 'page' : undefined}
               // A redirect off-site is a full navigation, not a client route.

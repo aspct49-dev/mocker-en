@@ -6,6 +6,10 @@
  */
 export function maskUsername(name: string | null | undefined): string {
   if (!name) return '****';
+  // Already masked upstream (CSGOBig sends "Ish*****"); masking it again
+  // would only throw away the letters it chose to show. Its runs of stars
+  // can be long, so they are capped like ours.
+  if (name.includes('*')) return name.replace(/\*{7,}/g, '******');
   if (name.length <= 2) return `${name[0]}***`;
   const stars = Math.min(Math.max(name.length - 2, 2), 6);
   return name[0] + '*'.repeat(stars) + name[name.length - 1];
@@ -20,11 +24,14 @@ export function formatAmount(n: number, opts: { cents?: boolean } = {}): string 
   });
 }
 
-/** "Oct 2 – Nov 1", in UTC, which is the clock the race runs on. */
+/** "Oct 2", in UTC, which is the clock the races run on. */
+export function dayLabel(iso: string): string {
+  return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+}
+
+/** "Oct 2 – Nov 1". */
 export function rangeLabel(start: string, end: string): string {
-  const fmt = (iso: string) =>
-    new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
-  return `${fmt(start)} – ${fmt(end)}`;
+  return `${dayLabel(start)} – ${dayLabel(end)}`;
 }
 
 /** The current calendar month, used only when no live race says otherwise. */

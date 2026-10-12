@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { CASINOS } from '@/lib/casinos';
+import { boardPath, CASINO_ORDER, CASINOS } from '@/lib/casinos';
 import { SITE } from '@/lib/site';
 import { ExternalIcon } from './icons';
 import { Socials } from './Socials';
@@ -14,18 +14,27 @@ import { Socials } from './Socials';
  * links are real hrefs, so they work before hydration and with the keyboard.
  */
 
-/* `page` is the route a link belongs to, so the one for the page you are on
-   can be marked current. Section anchors on the leaderboard have none. */
-const LINKS = [
-  { label: 'Leaderboard', href: '/#board', page: '/' },
-  { label: 'Bonuses', href: '/bonuses', page: '/bonuses' },
-  { label: 'How it works', href: '/#how' },
-  { label: 'Rules', href: '/#rules' },
-];
+/* The leaderboard pages on this site, by path, so the bar knows which board
+   it is sitting over. */
+const BOARDS = CASINO_ORDER.filter((id) => CASINOS[id].board.at === 'here').map((id) => ({
+  id,
+  path: boardPath(id),
+}));
 
 export function SiteNav() {
   const [stuck, setStuck] = useState(false);
   const pathname = usePathname();
+
+  // On a board, its own sections and its own casino; anywhere else, Rain's.
+  const board = BOARDS.find((b) => b.path === pathname);
+  const base = board?.path ?? '/';
+  const casino = CASINOS[board?.id ?? 'rain'];
+  const links = [
+    { label: 'Leaderboard', href: `${base}#board`, current: Boolean(board) },
+    { label: 'Bonuses', href: '/bonuses', current: pathname === '/bonuses' },
+    { label: 'How it works', href: `${base}#how`, current: false },
+    { label: 'Rules', href: `${base}#rules`, current: false },
+  ];
 
   useEffect(() => {
     const onScroll = () => setStuck(window.scrollY > 16);
@@ -43,8 +52,8 @@ export function SiteNav() {
         </Link>
 
         <nav className="nav-links" aria-label="Main">
-          {LINKS.map((l) => (
-            <a key={l.href} href={l.href} aria-current={l.page === pathname ? 'page' : undefined}>
+          {links.map((l) => (
+            <a key={l.label} href={l.href} aria-current={l.current ? 'page' : undefined}>
               {l.label}
             </a>
           ))}
@@ -52,8 +61,13 @@ export function SiteNav() {
 
         <Socials compact />
 
-        <a className="btn btn-primary nav-cta" href={CASINOS.rain.signupUrl} target="_blank" rel="noreferrer">
-          Join Rain.gg
+        <a
+          className="btn btn-primary nav-cta"
+          href={casino.signupUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Join {casino.name}
           <ExternalIcon />
         </a>
       </div>

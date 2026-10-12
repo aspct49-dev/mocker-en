@@ -3,23 +3,67 @@
 import { useEffect, useState } from 'react';
 
 /**
- * Time left in the race. Renders placeholders until mounted: the server's
- * clock and the visitor's do not agree to the second, and a hydration mismatch
- * on the most-watched number on the page is not worth it.
+ * Time to the start of the race while it has not opened, then time to the end
+ * — it switches over by itself at the start, without a reload.
+ *
+ * Renders placeholders until mounted: the server's clock and the visitor's do
+ * not agree to the second, and a hydration mismatch on the most-watched number
+ * on the page is not worth it. The date line is written in UTC on the server
+ * and swapped for the visitor's own time zone once mounted, which is an update
+ * rather than a mismatch.
  *
  * Not a live region. A screen reader announcing every second is noise; the
- * end date is stated in text beside it instead.
+ * date is stated in text beside it instead.
  */
-export function Countdown({ endsAt }: { endsAt: string }) {
-  const [left, setLeft] = useState<number | null>(null);
+
+type Phase = 'upcoming' | 'running' | 'ended';
+
+function format(iso: string, timeZone?: string) {
+  return new Date(iso).toLocaleString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone,
+    timeZoneName: 'short',
+  });
+}
+
+export function Countdown({
+  startsAt,
+  endsAt,
+  upcoming = false,
+}: {
+  startsAt?: string;
+  endsAt: string;
+  /** The server's view at render time, used until the client clock takes over. */
+  upcoming?: boolean;
+}) {
+  const [now, setNow] = useState<number | null>(null);
+  const [local, setLocal] = useState(false);
 
   useEffect(() => {
-    const target = new Date(endsAt).getTime();
-    const tick = () => setLeft(Math.max(0, target - Date.now()));
+    const tick = () => setNow(Date.now());
     tick();
+    setLocal(true);
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [endsAt]);
+  }, []);
+
+  const start = startsAt ? Date.parse(startsAt) : 0;
+  const end = Date.parse(endsAt);
+  const phase: Phase =
+    now === null
+      ? upcoming
+        ? 'upcoming'
+        : 'running'
+      : now < start
+        ? 'upcoming'
+        : now >= end
+          ? 'ended'
+          : 'running';
+  const target = phase === 'upcoming' ? start : end;
+  const left = now === null ? null : Math.max(0, target - now);
 
   const s = Math.floor((left ?? 0) / 1000);
   const cells: [number, string][] = [
@@ -29,18 +73,18 @@ export function Countdown({ endsAt }: { endsAt: string }) {
     [s % 60, 'Secs'],
   ];
 
-  const ends = new Date(endsAt).toLocaleString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'UTC',
-    timeZoneName: 'short',
-  });
+  const zone = local ? undefined : 'UTC';
+  const label = { upcoming: 'Race starts in', running: 'Race ends in', ended: 'Race has ended' }[
+    phase
+  ];
+  const line =
+    phase === 'upcoming' && startsAt
+      ? `Opens ${format(startsAt, zone)}`
+      : `Closes ${format(endsAt, zone)}`;
 
   return (
-    <div className="cd">
-      <p className="cd-label">{left === 0 ? 'Race has ended' : 'Race ends in'}</p>
+    <div className="cd" data-phase={phase}>
+      <p className="cd-label">{label}</p>
       <div className="cd-cells" aria-hidden>
         {cells.map(([value, unit], i) => (
           <div className="cd-group" key={unit}>
@@ -56,7 +100,7 @@ export function Countdown({ endsAt }: { endsAt: string }) {
           </div>
         ))}
       </div>
-      <p className="cd-ends">Closes {ends}</p>
+      <p className="cd-ends">{line}</p>
     </div>
   );
 }

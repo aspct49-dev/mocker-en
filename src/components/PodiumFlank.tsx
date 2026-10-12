@@ -39,14 +39,33 @@ const EMBERS: Record<Side, Ember[]> = {
   ],
 };
 
-export function PodiumFlank({ side }: { side: Side }) {
+/**
+ * `variant` picks the coin: Rain's, drawn, or CSGOBig's chip from its own
+ * SVG. The stars and embers take the board's `--coin` colour, so they match
+ * whichever coin is on show.
+ */
+export function PodiumFlank({ side, variant = 'rain' }: { side: Side; variant?: 'rain' | 'big' }) {
+  const coin = (depth: 'far' | 'mid' | 'near') =>
+    variant === 'big' ? (
+      // eslint-disable-next-line @next/next/no-img-element -- decorative vector art
+      <img
+        className={`flank-coin flank-coin-${depth}`}
+        src="/csgobig-coin.svg"
+        alt=""
+        width="172"
+        height="172"
+      />
+    ) : (
+      <CoinMark id={`${side}-${depth}`} className={`flank-coin flank-coin-${depth}`} />
+    );
+
   return (
-    <div className="flank" data-side={side} aria-hidden>
+    <div className="flank" data-side={side} data-variant={variant} aria-hidden>
       <span className="flank-glow" />
 
-      <CoinMark id={`${side}-far`} className="flank-coin flank-coin-far" />
-      <CoinMark id={`${side}-mid`} className="flank-coin flank-coin-mid" />
-      <CoinMark id={`${side}-near`} className="flank-coin flank-coin-near" />
+      {coin('far')}
+      {coin('mid')}
+      {coin('near')}
 
       <Sparkle className="flank-star flank-star-lit" />
       <Sparkle className="flank-star flank-star-dim" />
