@@ -9,7 +9,7 @@ export const revalidate = 1200;
 export const metadata: Metadata = {
   title: 'CSGOBig leaderboard',
   description:
-    'The Mocker-EN CSGOBig leaderboard: 5,000 coins across ten places. Play under code Mocker to enter.',
+    'The Mocker-EN CSGOBig leaderboard: 5,000 coins across ten places. Play under code mocker to enter.',
   alternates: { canonical: '/csgobig' },
 };
 

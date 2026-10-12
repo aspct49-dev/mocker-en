@@ -74,8 +74,8 @@ export const CASINOS: Record<CasinoId, Casino> = {
   csgobig: {
     id: 'csgobig',
     name: 'CSGOBig',
-    code: 'Mocker',
-    signupUrl: 'https://csgobig.com',
+    code: 'mocker',
+    signupUrl: 'https://csgobig.com/r/mocker',
     logo: '/csgobig-logo.png',
     logoSize: [800, 183],
     unit: { name: 'coins', icon: '/csgobig-coin.svg' },
@@ -90,8 +90,8 @@ export const CASINOS: Record<CasinoId, Casino> = {
         body: 'Create your CSGOBig account through the link on this page.',
       },
       {
-        title: 'Use code Mocker',
-        body: 'Enter Mocker as your affiliate code so your play is tied to the community race.',
+        title: 'Use code mocker',
+        body: 'Enter mocker as your affiliate code so your play is tied to the community race.',
       },
       {
         title: 'Wager and climb',
@@ -100,8 +100,8 @@ export const CASINOS: Record<CasinoId, Casino> = {
     ],
     rules: [
       {
-        title: 'Code Mocker only',
-        body: 'Only wagers on accounts using affiliate code Mocker count towards this race.',
+        title: 'Code mocker only',
+        body: 'Only wagers on accounts using affiliate code mocker count towards this race.',
       },
       {
         title: 'No wager abuse',
