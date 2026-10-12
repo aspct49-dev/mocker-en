@@ -145,7 +145,8 @@ gaming/esports pairing. Its suggested purple palette was not used — the brand
 art decides colour.
 
 The podium is flanked by a display of the casino's coins and stars
-(`components/PodiumFlank.tsx`: Rain's drawn coin, or CSGOBig's chip), tucked partly behind the outer cards, with
+(`components/PodiumFlank.tsx`: Rain's drawn coin and star on Rain's board,
+CSGOBig's chip and a CS crosshair on CSGOBig's), tucked partly behind the outer cards, with
 depth from size, blur and opacity. All of it is drawn in SVG and CSS, so it is
 sharp at any width, and it is static. It shrinks at tablet widths and is
 hidden once the cards stack on a phone.

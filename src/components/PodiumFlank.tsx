@@ -1,5 +1,5 @@
 import { CoinMark } from './CoinArt';
-import { Sparkle } from './icons';
+import { Crosshair, Sparkle } from './icons';
 
 /**
  * The display around the podium: a spill of Rain coins and Rain stars on
@@ -41,8 +41,8 @@ const EMBERS: Record<Side, Ember[]> = {
 
 /**
  * `variant` picks the coin: Rain's, drawn, or CSGOBig's chip from its own
- * SVG. The stars and embers take the board's `--coin` colour, so they match
- * whichever coin is on show.
+ * SVG — and the spark beside it: Rain's star, or a CS crosshair. Sparks and
+ * embers take the board's `--coin` colour, so they match the coin on show.
  */
 export function PodiumFlank({ side, variant = 'rain' }: { side: Side; variant?: 'rain' | 'big' }) {
   const coin = (depth: 'far' | 'mid' | 'near') =>
@@ -59,6 +59,8 @@ export function PodiumFlank({ side, variant = 'rain' }: { side: Side; variant?: 
       <CoinMark id={`${side}-${depth}`} className={`flank-coin flank-coin-${depth}`} />
     );
 
+  const Spark = variant === 'big' ? Crosshair : Sparkle;
+
   return (
     <div className="flank" data-side={side} data-variant={variant} aria-hidden>
       <span className="flank-glow" />
@@ -67,9 +69,11 @@ export function PodiumFlank({ side, variant = 'rain' }: { side: Side; variant?: 
       {coin('mid')}
       {coin('near')}
 
-      <Sparkle className="flank-star flank-star-lit" />
-      <Sparkle className="flank-star flank-star-dim" />
-      <Sparkle className="flank-star flank-star-tiny" />
+      {/* Rain's star is Rain's mark, so it only appears on Rain's board;
+          CSGOBig's gets a CS crosshair in the same places. */}
+      <Spark className="flank-star flank-star-lit" />
+      <Spark className="flank-star flank-star-dim" />
+      <Spark className="flank-star flank-star-tiny" />
 
       {EMBERS[side].map(([x, y, len, rot, op], i) => (
         <span
