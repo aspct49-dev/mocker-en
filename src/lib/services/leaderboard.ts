@@ -2,7 +2,6 @@ import 'server-only';
 
 import { getCasino } from '../casinos';
 import { currentMonth } from '../format';
-import { csgobigProvider } from '../providers/csgobig';
 import { rainProvider } from '../providers/rain';
 import { buildEntries } from '../providers/shared';
 import type { CasinoId, Leaderboard, LeaderboardProvider } from '../types';
@@ -14,7 +13,6 @@ import type { CasinoId, Leaderboard, LeaderboardProvider } from '../types';
  */
 const PROVIDERS: Partial<Record<CasinoId, LeaderboardProvider>> = {
   rain: rainProvider,
-  csgobig: csgobigProvider,
 };
 
 /**
@@ -26,11 +24,7 @@ const PROVIDERS: Partial<Record<CasinoId, LeaderboardProvider>> = {
  */
 function emptyBoard(casinoId: CasinoId, error: string): Leaderboard {
   const casino = getCasino(casinoId);
-  // A race defined here keeps its own window while the feed is down; one set
-  // by the operator falls back to the calendar month.
-  const { start, end } = casino.period
-    ? { start: new Date(casino.period.start), end: new Date(casino.period.end) }
-    : currentMonth();
+  const { start, end } = currentMonth();
   return {
     casinoId,
     prizePool: casino.fallbackPrizes.reduce((sum, n) => sum + n, 0),

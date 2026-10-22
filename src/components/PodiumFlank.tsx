@@ -1,5 +1,5 @@
 import { CoinMark } from './CoinArt';
-import { Crosshair, Sparkle } from './icons';
+import { Sparkle } from './icons';
 
 /**
  * The display around the podium: a spill of Rain coins and Rain stars on
@@ -39,41 +39,18 @@ const EMBERS: Record<Side, Ember[]> = {
   ],
 };
 
-/**
- * `variant` picks the coin: Rain's, drawn, or CSGOBig's chip from its own
- * SVG — and the spark beside it: Rain's star, or a CS crosshair. Sparks and
- * embers take the board's `--coin` colour, so they match the coin on show.
- */
-export function PodiumFlank({ side, variant = 'rain' }: { side: Side; variant?: 'rain' | 'big' }) {
-  const coin = (depth: 'far' | 'mid' | 'near') =>
-    variant === 'big' ? (
-      // eslint-disable-next-line @next/next/no-img-element -- decorative vector art
-      <img
-        className={`flank-coin flank-coin-${depth}`}
-        src="/csgobig-coin.svg"
-        alt=""
-        width="172"
-        height="172"
-      />
-    ) : (
-      <CoinMark id={`${side}-${depth}`} className={`flank-coin flank-coin-${depth}`} />
-    );
-
-  const Spark = variant === 'big' ? Crosshair : Sparkle;
-
+export function PodiumFlank({ side }: { side: Side }) {
   return (
-    <div className="flank" data-side={side} data-variant={variant} aria-hidden>
+    <div className="flank" data-side={side} aria-hidden>
       <span className="flank-glow" />
 
-      {coin('far')}
-      {coin('mid')}
-      {coin('near')}
+      <CoinMark id={`${side}-far`} className="flank-coin flank-coin-far" />
+      <CoinMark id={`${side}-mid`} className="flank-coin flank-coin-mid" />
+      <CoinMark id={`${side}-near`} className="flank-coin flank-coin-near" />
 
-      {/* Rain's star is Rain's mark, so it only appears on Rain's board;
-          CSGOBig's gets a CS crosshair in the same places. */}
-      <Spark className="flank-star flank-star-lit" />
-      <Spark className="flank-star flank-star-dim" />
-      <Spark className="flank-star flank-star-tiny" />
+      <Sparkle className="flank-star flank-star-lit" />
+      <Sparkle className="flank-star flank-star-dim" />
+      <Sparkle className="flank-star flank-star-tiny" />
 
       {EMBERS[side].map(([x, y, len, rot, op], i) => (
         <span

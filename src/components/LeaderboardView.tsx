@@ -14,8 +14,8 @@ import type { CasinoId } from '@/lib/types';
 
 /**
  * One casino's leaderboard page: hero and podium, standings, how to enter,
- * rules. Rain's page at / and CSGOBig's at /csgobig are both this, so the two
- * boards cannot drift apart in structure — only in what lib/casinos.ts says.
+ * rules. Rain's page at / is this, and a second casino's board would be too,
+ * so boards cannot drift apart in structure — only in what lib/casinos.ts says.
  */
 export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
   const casino = getCasino(casinoId);
@@ -72,9 +72,9 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
               </p>
             )}
             <div className="podium-stage">
-              <PodiumFlank side="left" variant={casino.flank ?? 'rain'} />
+              <PodiumFlank side="left" />
               <Podium board={board} casino={casino} />
-              <PodiumFlank side="right" variant={casino.flank ?? 'rain'} />
+              <PodiumFlank side="right" />
             </div>
           </div>
 

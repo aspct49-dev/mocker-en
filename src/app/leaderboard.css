@@ -481,18 +481,6 @@ a.switch-tab:hover .switch-ext {
   position: absolute;
   height: auto;
 }
-/* CSGOBig's chip has a near-black face; a thin ring of its own gold keeps it
-   from sinking into the page. */
-.flank[data-variant='big'] .flank-coin {
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--coin, var(--gold)) 35%, transparent);
-}
-/* The right flank is the left one mirrored. Rain's coin is symmetrical so it
-   does not show, but the chip's lettering would read backwards: flip the
-   chips back so "BIG" reads right. */
-.flank[data-side='right'][data-variant='big'] .flank-coin {
-  scale: -1 1;
-}
 /* Near: large, sharp, half behind the card. */
 .flank-coin-near {
   width: 40cqi;

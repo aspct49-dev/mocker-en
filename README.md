@@ -1,9 +1,8 @@
 # Mocker-EN — community leaderboards
 
-Wager leaderboards for the Mocker-EN community. The Rain.gg board (`/`) and the
-CSGOBig board (`/csgobig`) are on this site. The Gamdom board is run on
-[Mocker Rewards](https://mockerrewards.com): its tab links to `/gamdom`, which
-307-redirects there.
+Wager leaderboards for the Mocker-EN community. The Rain.gg board (`/`) is on
+this site. The Gamdom board is run on [Mocker Rewards](https://mockerrewards.com):
+its tab links to `/gamdom`, which 307-redirects there.
 
 Next.js 15 (App Router) · React 19 · TypeScript. No CSS framework — two
 hand-written stylesheets under `src/app`.
@@ -19,7 +18,6 @@ npm run dev                  # http://localhost:3000
 | Variable | What it is |
 |---|---|
 | `RAIN_API_KEY` | Rain.gg affiliate key, sent as `x-api-key`. Server-only. |
-| `CSGOBIG_API_KEY` | CSGOBig partner key, the path segment of its wagerStats URL. Server-only. |
 | `NEXT_PUBLIC_SITE_URL` | Canonical origin. Optional on Vercel. |
 
 ## Deploying to Vercel
@@ -33,10 +31,9 @@ npm run dev                  # http://localhost:3000
    | Variable | Value |
    |---|---|
    | `RAIN_API_KEY` | The Rain.gg affiliate API key. |
-   | `CSGOBIG_API_KEY` | The CSGOBig partner key. |
    | `NEXT_PUBLIC_SITE_URL` | Your final origin, e.g. `https://mocker-en.com`. Optional. |
 
-   The build succeeds without either key, but that board then shows every
+   The build succeeds without `RAIN_API_KEY`, but the board then shows every
    seat as open with a "temporarily unavailable" notice.
 3. Deploy, attach your domain under **Settings → Domains**, and set
    `NEXT_PUBLIC_SITE_URL` to match. Until it is set, canonical URLs, the
@@ -47,9 +44,6 @@ from its own store.
 
 After the first deploy, open `/robots.txt` and `/sitemap.xml` and check they
 point at your domain, and open `/gamdom` to check it lands on Mocker Rewards.
-
-Adding `CSGOBIG_API_KEY` to an existing Vercel project needs a redeploy before
-it takes effect.
 
 ## Data
 
@@ -67,29 +61,8 @@ seat as open with `fallbackPrizes` from `src/lib/casinos.ts` and a "temporarily
 unavailable" notice. It never shows sample rows. Keep `fallbackPrizes` in step
 with the race on Rain.
 
-### CSGOBig
-
-`src/lib/providers/csgobig.ts` reads CSGOBig's partner `wagerStats` endpoint
-for the race window. Unlike Rain, the race is defined here, in
-`src/lib/casinos.ts`:
-
-- `CSGOBIG_PERIOD` — start and end, as UTC instants. Currently 13 Oct 2026
-  08:45 IST to 13 Nov 2026 08:45 IST. These are the `time` / `to` values the
-  endpoint takes (it wants milliseconds; the provider converts).
-- `CSGOBIG_PRIZES` — 2,000 / 1,000 / 600 / 400 / 300 / 250 / 175 / 125 / 100 /
-  50, which is 5,000. The headline pool is summed from it.
-
-Before the start no request is made; the board shows open seats and the
-countdown counts to the opening, then switches to the close by itself.
-
-**Rate limit:** CSGOBig allows one request per key every 15 minutes and
-answers 429 past that, so the page and the fetch revalidate every 20 minutes.
-Anything else using the same key — a test from a terminal, another site —
-spends the same allowance.
-
 Usernames are masked (`D*****K`) in `providers/shared.ts`, so a new provider
-cannot forget to. CSGOBig masks its own (`Ish*****`); those are kept as sent,
-with long runs of stars capped.
+cannot forget to.
 
 ## Socials
 
@@ -144,9 +117,8 @@ Petch (body and every figure, tabular numerals), per the ui-ux-pro-max
 gaming/esports pairing. Its suggested purple palette was not used — the brand
 art decides colour.
 
-The podium is flanked by a display of the casino's coins and stars
-(`components/PodiumFlank.tsx`: Rain's drawn coin and star on Rain's board,
-CSGOBig's chip and a CS crosshair on CSGOBig's), tucked partly behind the outer cards, with
+The podium is flanked by a display of Rain coins and Rain stars
+(`components/PodiumFlank.tsx`), tucked partly behind the outer cards, with
 depth from size, blur and opacity. All of it is drawn in SVG and CSS, so it is
 sharp at any width, and it is static. It shrinks at tablet widths and is
 hidden once the cards stack on a phone.
@@ -174,7 +146,6 @@ src/
   app/
     layout.tsx       fonts, metadata, nav and footer
     page.tsx         the Rain.gg leaderboard
-    csgobig/         the CSGOBig leaderboard
     bonuses/         the bonuses page
     gamdom/          redirect to Mocker Rewards
     globals.css      tokens, buttons, nav, footer
@@ -188,7 +159,7 @@ src/
   components/        LeaderboardView (one board page, any casino), Podium,
                      Board, CasinoSwitch, Countdown, PodiumFlank, …
   lib/
-    casinos.ts       codes, links, prizes, race windows, steps, rules
+    casinos.ts       codes, links, prizes, steps, rules
     providers/       the only code that talks to a casino
     services/        the only entry point pages use for a board
 ```

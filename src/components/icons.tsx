@@ -135,20 +135,3 @@ export function KickIcon({ className }: P) {
     </svg>
   );
 }
-
-/** A CS crosshair: four bars round an open centre. The CSGOBig board's spark. */
-export function Crosshair({ className }: P) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.6"
-      strokeLinecap="round"
-      aria-hidden
-    >
-      <path d="M12 2.5v6M12 15.5v6M2.5 12h6M15.5 12h6" />
-    </svg>
-  );
-}
