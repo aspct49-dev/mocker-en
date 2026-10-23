@@ -4,7 +4,7 @@
  * from.
  */
 
-export type CasinoId = 'rain' | 'gamdom';
+export type CasinoId = 'rain' | 'casebattle' | 'gamdom';
 
 export interface Casino {
   id: CasinoId;
@@ -16,8 +16,13 @@ export interface Casino {
   logo: string;
   /** Its intrinsic size, so the space is reserved before it loads. */
   logoSize: [width: number, height: number];
-  /** What the prizes and wagers are counted in. */
-  unit: { name: string; icon: string };
+  /**
+   * What the prizes and wagers are counted in: a coin drawn as `icon`, or a
+   * currency written as `symbol` before the figure ("$1,500").
+   */
+  unit: { name: string; icon?: string; symbol?: string };
+  /** The hero line "All prizes are paid in …". Defaults to the casino's coins. */
+  paidIn?: string;
   /**
    * Where this casino's board lives.
    *
@@ -28,12 +33,22 @@ export interface Casino {
    */
   board: { at: 'here' } | { at: 'external'; url: string } | { at: 'soon' };
   /**
-   * The payout table used only when the operator's own one cannot be read.
-   * For Rain the live race carries its own distribution and that wins.
+   * The payout table. For Rain it is only the fallback — the live race
+   * carries its own distribution and that wins. For a race defined here
+   * (CaseBattle) it is the prize table itself.
    */
   fallbackPrizes: number[];
+  /**
+   * A race window set on this site rather than by the operator, as ISO
+   * instants. Rain's comes from Rain, so it has none.
+   */
+  period?: { start: string; end: string };
+  /** The clock the race's dates are written in. UTC when unset. */
+  timeZone?: string;
   /** Brand colour for coin figures on this casino's board. */
   coinColor?: string;
+  /** Which art flanks the podium: Rain's coins and stars, or CaseBattle's. */
+  flank?: 'rain' | 'casebattle';
   /** "How it works", in order. */
   steps?: { title: string; body: string }[];
   /** The rules shown under the board. */

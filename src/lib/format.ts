@@ -20,14 +20,19 @@ export function formatAmount(n: number, opts: { cents?: boolean } = {}): string 
   });
 }
 
-/** "Oct 2", in UTC, which is the clock the races run on. */
-export function dayLabel(iso: string): string {
-  return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+/** "Oct 2", on the race's clock — UTC unless the casino sets its own. */
+export function dayLabel(iso: string, timeZone = 'UTC'): string {
+  return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', timeZone });
 }
 
 /** "Oct 2 – Nov 1". */
-export function rangeLabel(start: string, end: string): string {
-  return `${dayLabel(start)} – ${dayLabel(end)}`;
+export function rangeLabel(start: string, end: string, timeZone?: string): string {
+  return `${dayLabel(start, timeZone)} – ${dayLabel(end, timeZone)}`;
+}
+
+/** An amount in words, for sentences: "$1,500" or "5,000 coins". */
+export function amountText(unit: { name: string; symbol?: string }, n: number): string {
+  return unit.symbol ? `${unit.symbol}${formatAmount(n)}` : `${formatAmount(n)} ${unit.name}`;
 }
 
 /** The current calendar month, used only when no live race says otherwise. */

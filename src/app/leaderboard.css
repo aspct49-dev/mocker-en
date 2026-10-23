@@ -70,6 +70,11 @@
   width: clamp(120px, 14vw, 160px);
   height: auto;
 }
+/* CaseBattle's mark is a wider strip with smaller letters than Rain's
+   wordmark; a little more width brings its letters up to the same weight. */
+.hero-partner[data-casino='casebattle'] {
+  width: clamp(150px, 17vw, 190px);
+}
 
 .hero-title {
   margin-top: 6px;
@@ -195,6 +200,9 @@ a.switch-tab:hover {
 .switch-logo[data-casino='gamdom'] {
   height: 26px;
 }
+.switch-logo[data-casino='casebattle'] {
+  height: 20px;
+}
 /* Three tabs on a phone: the marks shrink so each fits its third. */
 @media (max-width: 520px) {
   .switch-tab {
@@ -206,6 +214,9 @@ a.switch-tab:hover {
   }
   .switch-logo[data-casino='gamdom'] {
     height: 18px;
+  }
+  .switch-logo[data-casino='casebattle'] {
+    height: 13px;
   }
 }
 .switch-tab[aria-current='page'] .switch-logo,
@@ -496,6 +507,12 @@ a.switch-tab:hover .switch-ext {
   width: 15cqi;
   opacity: 0.55;
   filter: blur(1.6px);
+}
+/* The right flank is the left one mirrored. Rain's coin and star are
+   symmetrical so it does not show, but CaseBattle's dollar sign and its mark
+   would read backwards: flip them back. */
+.flank[data-side='right'][data-variant='casebattle'] :is(.flank-coin, .flank-star) {
+  scale: -1 1;
 }
 
 .flank-star {

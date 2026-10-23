@@ -1,8 +1,9 @@
 # Mocker-EN — community leaderboards
 
-Wager leaderboards for the Mocker-EN community. The Rain.gg board (`/`) is on
-this site. The Gamdom board is run on [Mocker Rewards](https://mockerrewards.com):
-its tab links to `/gamdom`, which 307-redirects there.
+Wager leaderboards for the Mocker-EN community. The Rain.gg board (`/`) and the
+CaseBattle board (`/casebattle`) are on this site. The Gamdom board is run on
+[Mocker Rewards](https://mockerrewards.com): its tab links to `/gamdom`, which
+307-redirects there.
 
 Next.js 15 (App Router) · React 19 · TypeScript. No CSS framework — two
 hand-written stylesheets under `src/app`.
@@ -11,13 +12,14 @@ hand-written stylesheets under `src/app`.
 
 ```bash
 npm install
-cp .env.example .env.local   # then fill in RAIN_API_KEY
+cp .env.example .env.local   # then fill in the two keys
 npm run dev                  # http://localhost:3000
 ```
 
 | Variable | What it is |
 |---|---|
 | `RAIN_API_KEY` | Rain.gg affiliate key, sent as `x-api-key`. Server-only. |
+| `CASEBATTLE_LEADERBOARD_PASSWORD` | CaseBattle deal's public leaderboard password. Server-only. |
 | `NEXT_PUBLIC_SITE_URL` | Canonical origin. Optional on Vercel. |
 
 ## Deploying to Vercel
@@ -31,9 +33,10 @@ npm run dev                  # http://localhost:3000
    | Variable | Value |
    |---|---|
    | `RAIN_API_KEY` | The Rain.gg affiliate API key. |
+   | `CASEBATTLE_LEADERBOARD_PASSWORD` | The CaseBattle deal's public leaderboard password. |
    | `NEXT_PUBLIC_SITE_URL` | Your final origin, e.g. `https://mocker-en.com`. Optional. |
 
-   The build succeeds without `RAIN_API_KEY`, but the board then shows every
+   The build succeeds without either key, but that board then shows every
    seat as open with a "temporarily unavailable" notice.
 3. Deploy, attach your domain under **Settings → Domains**, and set
    `NEXT_PUBLIC_SITE_URL` to match. Until it is set, canonical URLs, the
@@ -64,11 +67,33 @@ with the race on Rain.
 Usernames are masked (`D*****K`) in `providers/shared.ts`, so a new provider
 cannot forget to.
 
+## CaseBattle
+
+`src/lib/providers/casebattle.ts` reads the public leaderboard of our deal,
+`/deals/{deal}/leaderboard?password=…&from=…&to=…&limit=50`. The password is
+the deal's "public leaderboard password" from the CaseBattle deal dashboard;
+it is a secret and lives only in `CASEBATTLE_LEADERBOARD_PASSWORD`.
+
+Unlike Rain, the race is ours, not CaseBattle's: CaseBattle only reports what
+each referred player wagered between `from` and `to`. The window and the
+prize split are `CASEBATTLE_PERIOD` and `CASEBATTLE_PRIZES` in
+`src/lib/casinos.ts` — currently $1,500 over ten places
+(600/350/200/120/80/50/40/30/20/10), 23 Oct 2026 00:00 CEST to 22 Nov 2026
+23:59:59 CET. For the next race, change those two constants and the
+`clockNote` that states the dates in words. Prizes and wagers are dollars, so
+figures carry a `$` instead of a coin.
+
+The endpoint is undocumented. The reader expects CaseBattle's own leaderboard
+row, `{ user: { username, avatar }, wagered }`, but also takes flat names and
+`amount`/`points` in case the shape differs; when the first players appear,
+check the board against the deal dashboard. The fetch and page revalidate
+every 300 seconds. No request is made before the race opens.
+
 ## Socials
 
 Kick and X are `SOCIALS` in `src/lib/site.ts`; the top bar (icons) and the
-footer (with handles) both read it, and "Contact us" on the Rain bonus card
-links to X.
+footer (with handles) both read it, and a bonus card with `contact: true`
+gets a "Contact us" link to X.
 
 ## Gamdom
 
@@ -89,6 +114,7 @@ To host the Gamdom board on this site instead:
 ## Bonuses
 
 `/bonuses` is its own page (`src/app/bonuses/page.tsx`), linked from the nav.
+Only Gamdom has an offer there; Rain's was removed and CaseBattle has none.
 The offers are `BONUSES` in `src/lib/casinos.ts`: the headline figure and the
 words after it, the list of what is included, an optional note, and each
 casino's accent colour (taken from its logo). The cards
@@ -118,7 +144,8 @@ gaming/esports pairing. Its suggested purple palette was not used — the brand
 art decides colour.
 
 The podium is flanked by a display of Rain coins and Rain stars
-(`components/PodiumFlank.tsx`), tucked partly behind the outer cards, with
+(`components/PodiumFlank.tsx`) — on the CaseBattle board, dollar coins in
+CaseBattle's orange and its helmet mark — tucked partly behind the outer cards, with
 depth from size, blur and opacity. All of it is drawn in SVG and CSS, so it is
 sharp at any width, and it is static. It shrinks at tablet widths and is
 hidden once the cards stack on a phone.
@@ -146,6 +173,7 @@ src/
   app/
     layout.tsx       fonts, metadata, nav and footer
     page.tsx         the Rain.gg leaderboard
+    casebattle/      the CaseBattle leaderboard
     bonuses/         the bonuses page
     gamdom/          redirect to Mocker Rewards
     globals.css      tokens, buttons, nav, footer

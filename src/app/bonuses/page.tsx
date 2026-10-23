@@ -6,7 +6,7 @@ import { CASINOS } from '@/lib/casinos';
 export const metadata: Metadata = {
   title: 'Bonuses',
   description:
-    'Deposit bonuses, cash rewards and free cases on Rain.gg and Gamdom for playing under code Mocker.',
+    'Cash rewards, deposit bonuses and VIP transfer on Gamdom for playing under code mocker.',
   alternates: { canonical: '/bonuses' },
 };
 
@@ -19,7 +19,7 @@ export default function BonusesPage() {
         </h1>
         <p className="offers-lede">
           Claim your <span className="offers-lit">bonuses</span> with code{' '}
-          <b>{CASINOS.rain.code}</b> while supporting the community.
+          <b>{CASINOS.gamdom.code}</b> while supporting the community.
         </p>
       </header>
 

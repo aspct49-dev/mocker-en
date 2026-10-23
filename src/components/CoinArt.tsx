@@ -1,15 +1,16 @@
 /**
  * Drawn coins, so the art is sharp at any size and costs no image.
  *
- *   `rain` — Rain's coin: gold, with its star stamped in the face.
- *   `cash` — a mint coin with a dollar sign, in Gamdom's colour.
+ *   `rain`       — Rain's coin: gold, with its star stamped in the face.
+ *   `cash`       — a mint coin with a dollar sign, in Gamdom's colour.
+ *   `casebattle` — the same dollar coin in CaseBattle's orange.
  *
  * Each has a darker edge drawn under the face for thickness. Gradient ids
  * take an `id` prefix, so any number of coins can share a page without two
  * sharing a definition.
  */
 
-type Variant = 'rain' | 'cash';
+type Variant = 'rain' | 'cash' | 'casebattle';
 
 const PALETTE: Record<Variant, { edge: string; rimTop: string; rimBottom: string; faceA: string; faceB: string; ring: string; glyph: string }> = {
   rain: {
@@ -29,6 +30,15 @@ const PALETTE: Record<Variant, { edge: string; rimTop: string; rimBottom: string
     faceB: '#3dffa0',
     ring: '#00b85f',
     glyph: '#005c2c',
+  },
+  casebattle: {
+    edge: '#a85f00',
+    rimTop: '#ffd27a',
+    rimBottom: '#f59c0a',
+    faceA: '#ffa911',
+    faceB: '#fab12f',
+    ring: '#d98200',
+    glyph: '#7a4300',
   },
 };
 
