@@ -1,32 +1,13 @@
 import type { Bonus, Casino, CasinoId } from './types';
 
 /**
- * The casino registry. Codes, links, prize tables, race windows and the copy
- * each board shows live here and nowhere else.
+ * The casino registry. Codes, links, prize tables and the copy each board
+ * shows live here and nowhere else.
  *
  * Rain's live race carries its own payout distribution, so its
  * `fallbackPrizes` is only what the board shows while the feed is down. Keep
  * it in step with the race configured on Rain (5,000 coins over ten places).
  */
-
-/**
- * CaseBattle's race is defined here, not on CaseBattle: the window is the
- * `from` / `to` pair sent to its deal leaderboard endpoint, and the prize
- * split is ours.
- *
- * 23 Oct 2026 00:00 CEST to 22 Nov 2026 23:59:59 CET (clocks go back on
- * 25 Oct, hence the two offsets). To move it, change these two instants — the
- * provider, countdown, dates in the hero and the "starts in" state all read
- * them.
- */
-const CASEBATTLE_PERIOD = {
-  start: '2026-10-22T22:00:00.000Z',
-  end: '2026-11-22T22:59:59.999Z',
-};
-
-/** $1,500 over ten places. The pool is summed from this, never typed. */
-const CASEBATTLE_PRIZES = [600, 350, 200, 120, 80, 50, 40, 30, 20, 10];
-
 export const CASINOS: Record<CasinoId, Casino> = {
   rain: {
     id: 'rain',
@@ -73,55 +54,6 @@ export const CASINOS: Record<CasinoId, Casino> = {
     ],
     clockNote: 'The race closes on Rain’s clock, in UTC.',
   },
-  casebattle: {
-    id: 'casebattle',
-    name: 'CaseBattle',
-    code: 'mocker',
-    signupUrl: 'https://casebattle.com/r/mocker',
-    logo: '/casebattle-logo.svg',
-    logoSize: [724, 120],
-    unit: { name: 'dollars', symbol: '$' },
-    paidIn: 'dollars',
-    board: { at: 'here' },
-    fallbackPrizes: CASEBATTLE_PRIZES,
-    period: CASEBATTLE_PERIOD,
-    timeZone: 'Europe/Berlin',
-    coinColor: '#fab12f',
-    flank: 'casebattle',
-    steps: [
-      {
-        title: 'Sign up on CaseBattle',
-        body: 'Create your CaseBattle account through the link on this page.',
-      },
-      {
-        title: 'Use code mocker',
-        body: 'Enter mocker as your affiliate code so your play is tied to the community race.',
-      },
-      {
-        title: 'Wager and climb',
-        body: 'Every dollar you wager while the race is running counts. The top ten are paid when it ends.',
-      },
-    ],
-    rules: [
-      {
-        title: 'Code mocker only',
-        body: 'Only wagers on accounts using affiliate code mocker count towards this race.',
-      },
-      {
-        title: 'One account per person',
-        body: 'Alternate accounts are removed from the board, all of them, and the places below move up.',
-      },
-      {
-        title: 'No wager abuse',
-        body: 'Hedged or matched betting, cycling stakes between accounts and anything CaseBattle flags as abuse do not count, and can forfeit a prize.',
-      },
-      {
-        title: 'Paid when it closes',
-        body: 'The top ten are paid once the race closes and the standings are checked.',
-      },
-    ],
-    clockNote: 'Runs 23 Oct 00:00 to 22 Nov 23:59, Central European time.',
-  },
   gamdom: {
     id: 'gamdom',
     name: 'Gamdom',
@@ -129,7 +61,7 @@ export const CASINOS: Record<CasinoId, Casino> = {
     signupUrl: 'https://gamdom.com/r/mocker',
     logo: '/gamdom-logo.png',
     logoSize: [232, 54],
-    unit: { name: 'dollars', symbol: '$' },
+    unit: { name: 'dollars', icon: '' },
     // The Gamdom board is run on Mocker Rewards; /gamdom redirects there.
     board: { at: 'external', url: 'https://mockerrewards.com' },
     fallbackPrizes: [],
@@ -137,7 +69,7 @@ export const CASINOS: Record<CasinoId, Casino> = {
 };
 
 /** Order in the switcher. */
-export const CASINO_ORDER: CasinoId[] = ['rain', 'casebattle', 'gamdom'];
+export const CASINO_ORDER: CasinoId[] = ['rain', 'gamdom'];
 
 export function getCasino(id: CasinoId): Casino {
   return CASINOS[id];

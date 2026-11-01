@@ -8,14 +8,14 @@ import { ExternalIcon } from './icons';
 import { Podium } from './Podium';
 import { PodiumFlank } from './PodiumFlank';
 import { getCasino } from '@/lib/casinos';
-import { amountText, dayLabel, rangeLabel } from '@/lib/format';
+import { dayLabel, formatAmount, rangeLabel } from '@/lib/format';
 import { getLeaderboard } from '@/lib/services/leaderboard';
 import type { CasinoId } from '@/lib/types';
 
 /**
  * One casino's leaderboard page: hero and podium, standings, how to enter,
- * rules. Rain's page at / and CaseBattle's at /casebattle are both this, so
- * the boards cannot drift apart in structure — only in what lib/casinos.ts says.
+ * rules. Rain's page at / is this, and a second casino's board would be too,
+ * so boards cannot drift apart in structure — only in what lib/casinos.ts says.
  */
 export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
   const casino = getCasino(casinoId);
@@ -47,8 +47,7 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
 
           <p className="hero-lede">
             <Coin casino={casino} amount={board.prizePool} className="hero-pool" /> across{' '}
-            {board.entries.length} places ·{' '}
-            {rangeLabel(board.periodStart, board.periodEnd, casino.timeZone)}
+            {board.entries.length} places · {rangeLabel(board.periodStart, board.periodEnd)}
           </p>
 
           <div className="hero-actions">
@@ -60,9 +59,7 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
           </div>
 
           <CasinoSwitch active={casino.id} />
-          <p className="hero-unit">
-            All prizes are paid in {casino.paidIn ?? `${casino.name} coins`}
-          </p>
+          <p className="hero-unit">All prizes are paid in {casino.name} coins</p>
 
           <div className="hero-podium" id="board">
             {board.error && (
@@ -75,9 +72,9 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
               </p>
             )}
             <div className="podium-stage">
-              <PodiumFlank side="left" variant={casino.flank ?? 'rain'} />
+              <PodiumFlank side="left" />
               <Podium board={board} casino={casino} />
-              <PodiumFlank side="right" variant={casino.flank ?? 'rain'} />
+              <PodiumFlank side="right" />
             </div>
           </div>
 
@@ -93,7 +90,7 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
           {upcoming ? (
             <p className="feed">
               <span className="feed-dot" aria-hidden />
-              Opens {dayLabel(board.periodStart, casino.timeZone)}
+              Opens {dayLabel(board.periodStart)}
             </p>
           ) : (
             <FeedState at={board.updatedAt} live={live} source={casino.name} />
@@ -147,7 +144,7 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
               Rules
             </h2>
             <p className="section-sub">
-              Top {board.entries.length} share {amountText(casino.unit, board.prizePool)}.
+              Top {board.entries.length} share {formatAmount(board.prizePool)} coins.
               {casino.clockNote && ` ${casino.clockNote}`}
             </p>
           </div>
