@@ -30,6 +30,27 @@ export function rangeLabel(start: string, end: string): string {
   return `${dayLabel(start)} – ${dayLabel(end)}`;
 }
 
+/** An amount in words, for sentences: "$1,000" or "5,000 coins". */
+export function amountText(unit: { name: string; symbol?: string }, n: number): string {
+  return unit.symbol ? `${unit.symbol}${formatAmount(n)}` : `${formatAmount(n)} ${unit.name}`;
+}
+
+/**
+ * The race a recurring schedule is on at `now`: back-to-back windows of
+ * `days`, counted from `anchor`. Before the anchor it is the first race, not
+ * yet open.
+ */
+export function scheduledPeriod(
+  schedule: { anchor: string; days: number },
+  now: Date = new Date(),
+): { start: Date; end: Date } {
+  const anchor = Date.parse(schedule.anchor);
+  const length = schedule.days * 86_400_000;
+  const index = Math.max(0, Math.floor((now.getTime() - anchor) / length));
+  const start = anchor + index * length;
+  return { start: new Date(start), end: new Date(start + length) };
+}
+
 /** The current calendar month, used only when no live race says otherwise. */
 export function currentMonth(now: Date = new Date()): { start: Date; end: Date } {
   const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));

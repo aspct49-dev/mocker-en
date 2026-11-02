@@ -1,7 +1,7 @@
 # Mocker-EN — community leaderboards
 
-Wager leaderboards for the Mocker-EN community. The Rain.gg board (`/`) is on
-this site. The Gamdom board is run on [Mocker Rewards](https://mockerrewards.com):
+Wager leaderboards for the Mocker-EN community. The Rain.gg board (`/`) and the
+Unbox.gg board (`/unbox`) are on this site. The Gamdom board is run on [Mocker Rewards](https://mockerrewards.com):
 its tab links to `/gamdom`, which 307-redirects there.
 
 Next.js 15 (App Router) · React 19 · TypeScript. No CSS framework — two
@@ -18,6 +18,7 @@ npm run dev                  # http://localhost:3000
 | Variable | What it is |
 |---|---|
 | `RAIN_API_KEY` | Rain.gg affiliate key, sent as `x-api-key`. Server-only. |
+| `UNBOX_TOKEN` | Unbox.gg affiliate token, sent as `?token=`. Server-only. |
 | `NEXT_PUBLIC_SITE_URL` | Canonical origin. Optional on Vercel. |
 
 ## Deploying to Vercel
@@ -31,9 +32,10 @@ npm run dev                  # http://localhost:3000
    | Variable | Value |
    |---|---|
    | `RAIN_API_KEY` | The Rain.gg affiliate API key. |
+   | `UNBOX_TOKEN` | The Unbox.gg affiliate token. |
    | `NEXT_PUBLIC_SITE_URL` | Your final origin, e.g. `https://mocker-en.com`. Optional. |
 
-   The build succeeds without `RAIN_API_KEY`, but the board then shows every
+   The build succeeds without either key, but that board then shows every
    seat as open with a "temporarily unavailable" notice.
 3. Deploy, attach your domain under **Settings → Domains**, and set
    `NEXT_PUBLIC_SITE_URL` to match. Until it is set, canonical URLs, the
@@ -60,6 +62,26 @@ If the call fails, or there is no active race, the board renders every paying
 seat as open with `fallbackPrizes` from `src/lib/casinos.ts` and a "temporarily
 unavailable" notice. It never shows sample rows. Keep `fallbackPrizes` in step
 with the race on Rain.
+
+### Unbox.gg
+
+`src/lib/providers/unbox.ts` reads Unbox's public affiliate applicants
+endpoint for the current race. The race is ours, set in `src/lib/casinos.ts`:
+
+- `schedule` — back-to-back 14-day races from Mon 2 Nov 2026, 00:00 UTC
+  (05:30 IST). Move `anchor` to shift every race; the next one starts the
+  moment the last ends, with no deploy.
+- `fallbackPrizes` — $500 / $250 / $100 / $75 / $50 / $25, which is $1,000.
+  The headline pool is summed from it.
+
+Unbox rejects `take` above 30, so the provider reads 30 at a time until it has
+every player (up to 300), and caches for five minutes.
+
+**Entry fields are unconfirmed.** The endpoint had no entries when this was
+written, so the reader accepts the usual names (`username` / `name`,
+`wagered` / `amount` / `total`, `avatar`). If Unbox uses something else, the
+board shows "temporarily unavailable" and the server log names the fields it
+got; pin them in `providers/unbox.ts` then.
 
 Usernames are masked (`D*****K`) in `providers/shared.ts`, so a new provider
 cannot forget to.
@@ -119,8 +141,9 @@ Petch (body and every figure, tabular numerals), per the ui-ux-pro-max
 gaming/esports pairing. Its suggested purple palette was not used — the brand
 art decides colour.
 
-The podium is flanked by a display of Rain coins and Rain stars
-(`components/PodiumFlank.tsx`), tucked partly behind the outer cards, with
+The podium is flanked by a display of the casino's coins and sparks
+(`components/PodiumFlank.tsx`: Rain's coin and star on Rain's board, Unbox's
+violet dollar coin and a diamond from its mark on Unbox's), tucked partly behind the outer cards, with
 depth from size, blur and opacity. All of it is drawn in SVG and CSS, so it is
 sharp at any width, and it is static. It shrinks at tablet widths and is
 hidden once the cards stack on a phone.
@@ -148,6 +171,7 @@ src/
   app/
     layout.tsx       fonts, metadata, nav and footer
     page.tsx         the Rain.gg leaderboard
+    unbox/           the Unbox.gg leaderboard
     bonuses/         the bonuses page
     gamdom/          redirect to Mocker Rewards
     globals.css      tokens, buttons, nav, footer

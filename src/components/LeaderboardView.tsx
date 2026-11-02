@@ -8,7 +8,7 @@ import { ExternalIcon } from './icons';
 import { Podium } from './Podium';
 import { PodiumFlank } from './PodiumFlank';
 import { getCasino } from '@/lib/casinos';
-import { dayLabel, formatAmount, rangeLabel } from '@/lib/format';
+import { amountText, dayLabel, rangeLabel } from '@/lib/format';
 import { getLeaderboard } from '@/lib/services/leaderboard';
 import type { CasinoId } from '@/lib/types';
 
@@ -59,7 +59,7 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
           </div>
 
           <CasinoSwitch active={casino.id} />
-          <p className="hero-unit">All prizes are paid in {casino.name} coins</p>
+          <p className="hero-unit">All prizes are paid in {casino.paidIn ?? `${casino.name} coins`}</p>
 
           <div className="hero-podium" id="board">
             {board.error && (
@@ -72,9 +72,9 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
               </p>
             )}
             <div className="podium-stage">
-              <PodiumFlank side="left" />
+              <PodiumFlank side="left" variant={casino.flank} />
               <Podium board={board} casino={casino} />
-              <PodiumFlank side="right" />
+              <PodiumFlank side="right" variant={casino.flank} />
             </div>
           </div>
 
@@ -144,7 +144,7 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
               Rules
             </h2>
             <p className="section-sub">
-              Top {board.entries.length} share {formatAmount(board.prizePool)} coins.
+              Top {board.entries.length} share {amountText(casino.unit, board.prizePool)}.
               {casino.clockNote && ` ${casino.clockNote}`}
             </p>
           </div>

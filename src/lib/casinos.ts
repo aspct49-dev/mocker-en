@@ -54,6 +54,55 @@ export const CASINOS: Record<CasinoId, Casino> = {
     ],
     clockNote: 'The race closes on Rain’s clock, in UTC.',
   },
+  unbox: {
+    id: 'unbox',
+    name: 'Unbox.gg',
+    // Placeholders until the referral link is confirmed.
+    code: 'mocker',
+    signupUrl: 'https://unbox.gg',
+    logo: '/unbox-logo.png',
+    logoSize: [172, 57],
+    // Unbox's own coin is a dollar, so prizes and wagers read as dollars.
+    unit: { name: 'dollars', icon: '/unbox-coin.png', symbol: '$' },
+    board: { at: 'here' },
+    // $1,000 a fortnight over six places. The pool is summed from this.
+    fallbackPrizes: [500, 250, 100, 75, 50, 25],
+    // Back-to-back two-week races from Mon 2 Nov 2026, 00:00 UTC. Move the
+    // anchor to shift every race; change `days` to change their length.
+    schedule: { anchor: '2026-11-02T00:00:00.000Z', days: 14 },
+    coinColor: '#8b7bff',
+    flank: 'unbox',
+    paidIn: 'dollars on Unbox.gg',
+    steps: [
+      {
+        title: 'Sign up on Unbox.gg',
+        body: 'Create your Unbox.gg account through the link on this page.',
+      },
+      {
+        title: 'Use code mocker',
+        body: 'Enter mocker as your affiliate code so your play is tied to the community race.',
+      },
+      {
+        title: 'Wager and climb',
+        body: 'Every dollar you wager while the race is running counts. The top six are paid when it ends, and the next race starts straight away.',
+      },
+    ],
+    rules: [
+      {
+        title: 'Code mocker only',
+        body: 'Only wagers on accounts using affiliate code mocker count towards this race.',
+      },
+      {
+        title: 'No wager abuse',
+        body: 'Hedged or matched betting, cycling stakes between accounts and anything Unbox.gg flags as abuse do not count, and can forfeit a prize.',
+      },
+      {
+        title: 'Every two weeks',
+        body: 'Each race runs for 14 days and the board resets for the next one. The top six of each race are paid once it closes.',
+      },
+    ],
+    clockNote: 'A new race starts every two weeks.',
+  },
   gamdom: {
     id: 'gamdom',
     name: 'Gamdom',
@@ -69,7 +118,7 @@ export const CASINOS: Record<CasinoId, Casino> = {
 };
 
 /** Order in the switcher. */
-export const CASINO_ORDER: CasinoId[] = ['rain', 'gamdom'];
+export const CASINO_ORDER: CasinoId[] = ['rain', 'unbox', 'gamdom'];
 
 export function getCasino(id: CasinoId): Casino {
   return CASINOS[id];

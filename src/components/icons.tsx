@@ -135,3 +135,12 @@ export function KickIcon({ className }: P) {
     </svg>
   );
 }
+
+/** A small tilted diamond, after the tiles in Unbox.gg's mark. */
+export function Diamond({ className }: P) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 1.5 22.5 12 12 22.5 1.5 12z" />
+    </svg>
+  );
+}

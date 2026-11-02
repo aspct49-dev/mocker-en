@@ -4,7 +4,7 @@
  * from.
  */
 
-export type CasinoId = 'rain' | 'gamdom';
+export type CasinoId = 'rain' | 'unbox' | 'gamdom';
 
 export interface Casino {
   id: CasinoId;
@@ -16,8 +16,11 @@ export interface Casino {
   logo: string;
   /** Its intrinsic size, so the space is reserved before it loads. */
   logoSize: [width: number, height: number];
-  /** What the prizes and wagers are counted in. */
-  unit: { name: string; icon: string };
+  /**
+   * What the prizes and wagers are counted in. `symbol` is for sentences:
+   * set, amounts read "$1,000"; unset, "5,000 coins".
+   */
+  unit: { name: string; icon: string; symbol?: string };
   /**
    * Where this casino's board lives.
    *
@@ -40,6 +43,15 @@ export interface Casino {
   rules?: { title: string; body: string }[];
   /** One line under the Rules heading after the prize sentence. */
   clockNote?: string;
+  /** How prizes are paid, under the switcher. Defaults to "{name} coins". */
+  paidIn?: string;
+  /** Which art flanks the podium. Defaults to Rain's coins and stars. */
+  flank?: 'rain' | 'unbox';
+  /**
+   * A recurring race set on this site rather than by the operator: the first
+   * race starts at `anchor` (ISO) and each lasts `days`, back to back.
+   */
+  schedule?: { anchor: string; days: number };
 }
 
 export interface LeaderboardEntry {
