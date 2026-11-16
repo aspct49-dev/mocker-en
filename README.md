@@ -33,6 +33,7 @@ npm run dev                  # http://localhost:3000
    |---|---|
    | `RAIN_API_KEY` | The Rain.gg affiliate API key. |
    | `UNBOX_TOKEN` | The Unbox.gg affiliate token. |
+   | `CRON_SECRET` | Any long random string; guards the archive job. |
    | `NEXT_PUBLIC_SITE_URL` | Your final origin, e.g. `https://mocker-en.com`. Optional. |
 
    The build succeeds without either key, but that board then shows every
@@ -77,14 +78,55 @@ endpoint for the current race. The race is ours, set in `src/lib/casinos.ts`:
 Unbox rejects `take` above 30, so the provider reads 30 at a time until it has
 every player (up to 300), and caches for five minutes.
 
-**Entry fields are unconfirmed.** The endpoint had no entries when this was
-written, so the reader accepts the usual names (`username` / `name`,
-`wagered` / `amount` / `total`, `avatar`). If Unbox uses something else, the
-board shows "temporarily unavailable" and the server log names the fields it
-got; pin them in `providers/unbox.ts` then.
+Entries arrive as `{ user: { username, avatarUrl }, wagered: "12.34", … }`;
+the reader also accepts other common names, and if an entry matches none it
+shows "temporarily unavailable" and logs the fields it got.
+
+**Watch:** the endpoint is "applicants", and its `from`/`to` may filter by
+signup date rather than by when wagers happened. If players who joined before
+a race never appear in it, that is why.
 
 Usernames are masked (`D*****K`) in `providers/shared.ts`, so a new provider
 cannot forget to.
+
+## Past leaderboards
+
+Every finished race is kept, and each board shows them under its standings:
+one card per race (dates, prize pool, top three), each linking to
+`/past/<casino>/<YYYY-MM-DD>` with the full final standings. kingkulbik's
+Past Leaderboards panel was the model.
+
+**Where they are kept:** Vercel Blob, one JSON file per race
+(`src/lib/archive/store.ts`). Locally, with no Blob token, the same files go
+to `.archive/` (gitignored), so the whole flow can be tried without Vercel.
+
+**How they are kept:** `/api/archive` (`src/lib/archive/archiver.ts`), run by
+Vercel Cron once a day at 23:50 UTC (`vercel.json`):
+
+- **Unbox** races are ours, so a finished fortnight is fetched whole from
+  Unbox after it ends and kept. Missed ones are filled in, up to twelve back.
+- **Rain** only reports the race that is running, so its standings are kept
+  as a snapshot — by the cron, and by the board itself on every refresh in a
+  race's last six hours — and the last snapshot becomes the result once the
+  race has been over for 30 minutes. The race's page says when its standings
+  were last read.
+
+**Starting the next race:** Unbox's starts by itself the moment the last
+ends (`schedule`). Rain's are created on Rain; its API cannot create one.
+Between Rain races the board shows the last race's final results with a note
+that the next one is coming, not "temporarily unavailable". To have Rain
+start each race itself, set the race to recur in Rain's dashboard.
+
+**Setup on Vercel, once:**
+
+1. **Storage → Create → Blob**, and connect it to this project. That sets
+   `BLOB_READ_WRITE_TOKEN`.
+2. Add `CRON_SECRET` (any long random string) under Environment Variables.
+   Vercel's cron sends it; on Vercel, `/api/archive` refuses anyone without it.
+3. Redeploy. To keep a race straight away rather than at 23:50 UTC, open the
+   cron job under **Settings → Cron Jobs** and press **Run**.
+
+Locally: `curl http://localhost:3000/api/archive` runs the same job.
 
 ## Socials
 
@@ -172,6 +214,8 @@ src/
     layout.tsx       fonts, metadata, nav and footer
     page.tsx         the Rain.gg leaderboard
     unbox/           the Unbox.gg leaderboard
+    past/            a finished race's final standings
+    api/archive/     the archive job (Vercel Cron)
     bonuses/         the bonuses page
     gamdom/          redirect to Mocker Rewards
     globals.css      tokens, buttons, nav, footer
@@ -186,6 +230,7 @@ src/
                      Board, CasinoSwitch, Countdown, PodiumFlank, …
   lib/
     casinos.ts       codes, links, prizes, steps, rules
+    archive/         keeping finished races (store, job, cached reads)
     providers/       the only code that talks to a casino
     services/        the only entry point pages use for a board
 ```

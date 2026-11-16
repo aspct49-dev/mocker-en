@@ -946,3 +946,162 @@ a.switch-tab:hover .switch-ext {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Past leaderboards ---------- */
+
+/*
+ * Finished races (components/PastRaces.tsx): a row of cards that scrolls
+ * sideways once it outgrows the column, snapping card to card. Three fit a
+ * desktop row; a phone shows one and the edge of the next, which says there
+ * is more without an arrow.
+ */
+.past-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 2 * 16px) / 3);
+  gap: 16px;
+  margin: 0;
+  padding: 0 0 12px;
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--edge-lit) transparent;
+}
+.past-card {
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--edge);
+  border-top: 2px solid var(--coin, var(--gold));
+  background: var(--ground);
+}
+.past-dates {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.past-pool {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--coin, var(--gold));
+}
+.past-pool-label {
+  color: var(--dim);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+}
+.past-top {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.past-top li {
+  display: grid;
+  grid-template-columns: 22px 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.past-rank {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 20px;
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  background: var(--edge);
+  font-family: var(--font-display);
+  font-size: 12px;
+}
+.past-top li[data-place='1'] .past-rank {
+  background: var(--gold);
+  color: #1d1200;
+}
+.past-top li[data-place='2'] .past-rank {
+  background: var(--silver);
+  color: #11181c;
+}
+.past-top li[data-place='3'] .past-rank {
+  background: var(--bronze);
+  color: #1e0f02;
+}
+.past-avatar {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--edge-lit);
+}
+.past-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.past-wager {
+  color: var(--muted);
+  font-size: 13px;
+}
+.past-empty {
+  color: var(--dim);
+  font-size: 14px;
+}
+.past-link {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 6px 0;
+  color: var(--green-hi);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.past-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 860px) {
+  .past-row {
+    grid-auto-columns: calc((100% - 16px) / 2);
+  }
+}
+@media (max-width: 560px) {
+  .past-row {
+    grid-auto-columns: 82%;
+  }
+}
+
+/* A finished race's own page: the way back sits above the operator mark. */
+.past-back {
+  margin-bottom: 18px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.past-back:hover {
+  color: var(--text);
+  background: var(--hull);
+}
+
+/* Between races: information, not a warning. */
+.notice-calm {
+  border-color: var(--edge-lit);
+  background: rgba(34, 209, 107, 0.06);
+}
+.notice-calm .notice-mark {
+  background: var(--green);
+  color: var(--green-ink);
+}

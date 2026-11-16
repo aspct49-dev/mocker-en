@@ -81,6 +81,11 @@ export interface Leaderboard {
   periodEnd: string;
   updatedAt: string;
   source: 'live' | 'empty';
+  /**
+   * The operator has no race running (Rain between races). Not a failure:
+   * the page shows the last race's final results instead of empty seats.
+   */
+  idle?: boolean;
   /** Set when the live call failed and an empty board was served instead. */
   error?: string;
 }
@@ -103,4 +108,24 @@ export interface Bonus {
   features: string[];
   /** Whether the small print under the button adds "Contact us for more info". */
   contact?: boolean;
+}
+
+/**
+ * A finished race, kept: its window, its prize table and its final standings
+ * (paying places, names already masked). `final` is false for a running
+ * race's latest snapshot, which becomes the result once the race is over.
+ */
+export interface ArchivedRace {
+  casinoId: CasinoId;
+  /** The race's start day, YYYY-MM-DD (UTC). Unique per casino. */
+  id: string;
+  start: string;
+  end: string;
+  prizes: number[];
+  prizePool: number;
+  entries: LeaderboardEntry[];
+  stats: BoardStats;
+  /** When these standings were read from the operator. */
+  takenAt: string;
+  final: boolean;
 }

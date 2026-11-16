@@ -1,10 +1,13 @@
 import 'server-only';
 
+import { after } from 'next/server';
+
+import { archiveMode, saveSnapshot, toArchived } from '../archive/store';
 import { getCasino } from '../casinos';
 import { currentMonth, scheduledPeriod } from '../format';
 import { rainProvider } from '../providers/rain';
 import { unboxProvider } from '../providers/unbox';
-import { buildEntries } from '../providers/shared';
+import { buildEntries, NoActiveRaceError } from '../providers/shared';
 import type { CasinoId, Leaderboard, LeaderboardProvider } from '../types';
 
 /**
@@ -46,10 +49,43 @@ export async function getLeaderboard(casinoId: CasinoId): Promise<Leaderboard> {
   const provider = PROVIDERS[casinoId];
   if (!provider) return emptyBoard(casinoId, 'No provider');
   try {
-    return await provider.fetchLeaderboard();
+    const board = await provider.fetchLeaderboard();
+    keepNearTheEnd(board);
+    return board;
   } catch (err) {
+    if (err instanceof NoActiveRaceError) {
+      // Between races: not an error, and nothing to log.
+      return { ...emptyBoard(casinoId, ''), error: undefined, idle: true };
+    }
     const message = err instanceof Error ? err.message : 'Unknown error';
     console.error(`[leaderboard] ${casinoId} provider failed:`, message);
     return emptyBoard(casinoId, message);
   }
 }
+
+/** How close to its end an operator-run race starts having its standings kept. */
+const FINAL_HOURS = 6;
+
+/**
+ * Rain only reports a race while it runs, so its final standings have to be
+ * caught before it ends. In a race's last hours, every fresh read of the board
+ * (at most every ten minutes, the page's cache) also saves a snapshot, after
+ * the response is sent; the archive job keeps the last one as the result.
+ * Races scheduled here (Unbox) are fetched whole after they end instead.
+ */
+function keepNearTheEnd(board: Leaderboard) {
+  if (getCasino(board.casinoId).schedule || archiveMode() === 'off') return;
+  const left = Date.parse(board.periodEnd) - Date.now();
+  if (left <= 0 || left > FINAL_HOURS * 3_600_000) return;
+  try {
+    after(() =>
+      saveSnapshot(toArchived(board, false)).catch((err: Error) =>
+        console.error(`[archive] ${board.casinoId} snapshot failed:`, err.message),
+      ),
+    );
+  } catch {
+    // Outside a request (a build), there is nothing to defer to; the cron
+    // job's own snapshot covers it.
+  }
+}
+

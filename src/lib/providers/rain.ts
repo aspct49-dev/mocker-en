@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { getCasino } from '../casinos';
-import { buildEntries, type RawPlayer } from './shared';
+import { buildEntries, NoActiveRaceError, type RawPlayer } from './shared';
 import type { Leaderboard, LeaderboardProvider } from '../types';
 
 /**
@@ -67,7 +67,7 @@ export const rainProvider: LeaderboardProvider = {
     // the board up if the code is ever re-cased on Rain's side.
     const race =
       active.find((r) => r.code.toLowerCase() === casino.code.toLowerCase()) ?? active[0];
-    if (!race) throw new Error('No active Rain race');
+    if (!race) throw new NoActiveRaceError('No active Rain race');
 
     const prizes = race.payout_distribution.map((p) => p / 100);
     const participants = [...(race.participants ?? [])].sort((a, b) => a.position - b.position);

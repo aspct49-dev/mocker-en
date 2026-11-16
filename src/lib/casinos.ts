@@ -6,7 +6,7 @@ import type { Bonus, Casino, CasinoId } from './types';
  *
  * Rain's live race carries its own payout distribution, so its
  * `fallbackPrizes` is only what the board shows while the feed is down. Keep
- * it in step with the race configured on Rain (5,000 coins over ten places).
+ * it in step with the race configured on Rain (1,500 coins over seven places).
  */
 export const CASINOS: Record<CasinoId, Casino> = {
   rain: {
@@ -18,7 +18,7 @@ export const CASINOS: Record<CasinoId, Casino> = {
     logoSize: [610, 120],
     unit: { name: 'coins', icon: '/rain-coin.webp' },
     board: { at: 'here' },
-    fallbackPrizes: [2000, 1200, 800, 500, 250, 100, 50, 50, 25, 25],
+    fallbackPrizes: [700, 400, 200, 100, 50, 35, 15],
     coinColor: '#f7b016',
     steps: [
       {

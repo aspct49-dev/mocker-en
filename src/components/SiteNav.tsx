@@ -26,7 +26,9 @@ export function SiteNav() {
   const pathname = usePathname();
 
   // On a board, its own sections and its own casino; anywhere else, Rain's.
-  const board = BOARDS.find((b) => b.path === pathname);
+  // A finished race's page (/past/<casino>/<id>) belongs to that casino's board.
+  const pastOf = pathname.match(/^\/past\/([^/]+)\//)?.[1];
+  const board = BOARDS.find((b) => b.path === pathname || b.id === pastOf);
   const base = board?.path ?? '/';
   const casino = CASINOS[board?.id ?? 'rain'];
   const links = [

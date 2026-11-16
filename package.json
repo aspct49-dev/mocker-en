@@ -12,6 +12,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
+    "@vercel/blob": "^2.9.0",
     "next": "^15.5.25",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
@@ -24,5 +25,7 @@
     "@types/react-dom": "^19.2.7",
     "typescript": "^5.9.3"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

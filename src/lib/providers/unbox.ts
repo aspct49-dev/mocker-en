@@ -74,70 +74,77 @@ function toPlayer(entry: Entry): RawPlayer {
   };
 }
 
+/**
+ * Standings for any race window — the current race for the live board, or a
+ * finished one when the archive keeps it after it ends.
+ */
+export async function fetchUnboxWindow(start: Date, end: Date): Promise<Leaderboard> {
+  const casino = getCasino('unbox');
+  const prizes = casino.fallbackPrizes;
+  const base = {
+    casinoId: 'unbox' as const,
+    prizePool: prizes.reduce((sum, n) => sum + n, 0),
+    periodStart: start.toISOString(),
+    periodEnd: end.toISOString(),
+    updatedAt: new Date().toISOString(),
+    source: 'live' as const,
+  };
+
+  if (Date.now() < start.getTime()) {
+    return { ...base, entries: buildEntries([], prizes), stats: { players: 0, totalWagered: 0 } };
+  }
+
+  const token = process.env.UNBOX_TOKEN;
+  if (!token) throw new Error('UNBOX_TOKEN is not set');
+
+  // Every page, so the totals under the board count every player and not
+  // just the first thirty.
+  const list: Entry[] = [];
+  let totalCount = 0;
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const url = new URL(ENDPOINT);
+    url.searchParams.set('token', token);
+    url.searchParams.set('skip', String(page * PAGE));
+    url.searchParams.set('take', String(PAGE));
+    url.searchParams.set('order', 'DESC');
+    url.searchParams.set('from', start.toISOString());
+    // The race's end even while it runs, so the URL — and the cache
+    // entry — stays the same for the whole fortnight.
+    url.searchParams.set('to', end.toISOString());
+
+    const res = await fetch(url, {
+      headers: { accept: 'application/json' },
+      next: { revalidate: REVALIDATE_SECONDS },
+    });
+    if (!res.ok) throw new Error(`Unbox responded ${res.status}`);
+
+    const body = (await res.json()) as { totalCount?: number; list?: Entry[] };
+    const rows = body.list ?? [];
+    totalCount = body.totalCount ?? totalCount;
+    list.push(...rows);
+    if (rows.length < PAGE || list.length >= totalCount) break;
+  }
+
+  const ranked = list
+    .map(toPlayer)
+    .filter((p) => p.wagered > 0)
+    .sort((a, b) => b.wagered - a.wagered);
+
+  return {
+    ...base,
+    entries: buildEntries(ranked, prizes),
+    stats: {
+      players: Math.max(totalCount, ranked.length),
+      totalWagered: ranked.reduce((sum, p) => sum + p.wagered, 0),
+    },
+  };
+}
+
 export const unboxProvider: LeaderboardProvider = {
   casinoId: 'unbox',
 
   async fetchLeaderboard(): Promise<Leaderboard> {
-    const casino = getCasino('unbox');
-    const prizes = casino.fallbackPrizes;
-    const { start, end } = scheduledPeriod(casino.schedule!);
-
-    const base = {
-      casinoId: 'unbox' as const,
-      prizePool: prizes.reduce((sum, n) => sum + n, 0),
-      periodStart: start.toISOString(),
-      periodEnd: end.toISOString(),
-      updatedAt: new Date().toISOString(),
-      source: 'live' as const,
-    };
-
-    if (Date.now() < start.getTime()) {
-      return { ...base, entries: buildEntries([], prizes), stats: { players: 0, totalWagered: 0 } };
-    }
-
-    const token = process.env.UNBOX_TOKEN;
-    if (!token) throw new Error('UNBOX_TOKEN is not set');
-
-    // Every page, so the totals under the board count every player and not
-    // just the first thirty.
-    const list: Entry[] = [];
-    let totalCount = 0;
-    for (let page = 0; page < MAX_PAGES; page++) {
-      const url = new URL(ENDPOINT);
-      url.searchParams.set('token', token);
-      url.searchParams.set('skip', String(page * PAGE));
-      url.searchParams.set('take', String(PAGE));
-      url.searchParams.set('order', 'DESC');
-      url.searchParams.set('from', start.toISOString());
-      // The race's end even while it runs, so the URL — and the cache
-      // entry — stays the same for the whole fortnight.
-      url.searchParams.set('to', end.toISOString());
-
-      const res = await fetch(url, {
-        headers: { accept: 'application/json' },
-        next: { revalidate: REVALIDATE_SECONDS },
-      });
-      if (!res.ok) throw new Error(`Unbox responded ${res.status}`);
-
-      const body = (await res.json()) as { totalCount?: number; list?: Entry[] };
-      const rows = body.list ?? [];
-      totalCount = body.totalCount ?? totalCount;
-      list.push(...rows);
-      if (rows.length < PAGE || list.length >= totalCount) break;
-    }
-
-    const ranked = list
-      .map(toPlayer)
-      .filter((p) => p.wagered > 0)
-      .sort((a, b) => b.wagered - a.wagered);
-
-    return {
-      ...base,
-      entries: buildEntries(ranked, prizes),
-      stats: {
-        players: Math.max(totalCount, ranked.length),
-        totalWagered: ranked.reduce((sum, p) => sum + p.wagered, 0),
-      },
-    };
+    const { start, end } = scheduledPeriod(getCasino('unbox').schedule!);
+    return fetchUnboxWindow(start, end);
   },
 };

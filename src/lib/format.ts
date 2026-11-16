@@ -6,9 +6,13 @@
  */
 export function maskUsername(name: string | null | undefined): string {
   if (!name) return '****';
-  if (name.length <= 2) return `${name[0]}***`;
-  const stars = Math.min(Math.max(name.length - 2, 2), 6);
-  return name[0] + '*'.repeat(stars) + name[name.length - 1];
+  // By whole characters, not UTF-16 units: an emoji is two units, and keeping
+  // one of them leaves half a character that the server and the browser
+  // render differently — a hydration error on the page.
+  const chars = Array.from(name);
+  if (chars.length <= 2) return `${chars[0]}***`;
+  const stars = Math.min(Math.max(chars.length - 2, 2), 6);
+  return chars[0] + '*'.repeat(stars) + chars[chars.length - 1];
 }
 
 /** Coin figures. Wagers carry cents; prizes are whole unless they are not. */

@@ -2,6 +2,17 @@ import { maskUsername } from '../format';
 import type { LeaderboardEntry } from '../types';
 
 /**
+ * The operator has no race running right now — not a fault. The service turns
+ * this into an idle board rather than a "temporarily unavailable" one.
+ */
+export class NoActiveRaceError extends Error {
+  constructor(message = 'No active race') {
+    super(message);
+    this.name = 'NoActiveRaceError';
+  }
+}
+
+/**
  * What a provider knows about a player before ranks and prizes are applied.
  * `username` is the operator's raw name; masking happens in `buildEntries` so
  * a new integration cannot forget it.

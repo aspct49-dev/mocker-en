@@ -5,10 +5,12 @@ import { CopyCode } from './CopyCode';
 import { Countdown } from './Countdown';
 import { FeedState } from './FeedState';
 import { ExternalIcon } from './icons';
+import { PastRaces } from './PastRaces';
 import { Podium } from './Podium';
 import { PodiumFlank } from './PodiumFlank';
 import { getCasino } from '@/lib/casinos';
 import { amountText, dayLabel, rangeLabel } from '@/lib/format';
+import { archivedToBoard, pastRaces } from '@/lib/archive/read';
 import { getLeaderboard } from '@/lib/services/leaderboard';
 import type { CasinoId } from '@/lib/types';
 
@@ -19,7 +21,13 @@ import type { CasinoId } from '@/lib/types';
  */
 export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
   const casino = getCasino(casinoId);
-  const board = await getLeaderboard(casinoId);
+  const [current, past] = await Promise.all([getLeaderboard(casinoId), pastRaces(casinoId)]);
+  // Between races (Rain), the podium and standings show the last race's final
+  // results rather than empty seats; it then leaves the past row so it is not
+  // shown twice.
+  const last = current.idle ? past[0] : undefined;
+  const board = last ? { ...archivedToBoard(last), idle: true } : current;
+  const earlier = last ? past.slice(1) : past;
   const live = board.source === 'live';
   const [logoW, logoH] = casino.logoSize;
   // Rendered on the server, so this is as of the last regeneration; the
@@ -59,9 +67,21 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
           </div>
 
           <CasinoSwitch active={casino.id} />
-          <p className="hero-unit">All prizes are paid in {casino.paidIn ?? `${casino.name} coins`}</p>
+          <p className="hero-unit">
+            All prizes are paid in {casino.paidIn ?? `${casino.name} coins`}
+          </p>
 
           <div className="hero-podium" id="board">
+            {board.idle && (
+              <p className="notice notice-calm">
+                <span className="notice-mark" aria-hidden>
+                  i
+                </span>
+                {last
+                  ? `No race is running right now. These are the final results of the last race, ${rangeLabel(last.start, last.end)}. The next one starts soon.`
+                  : 'No race is running right now. The next one starts soon.'}
+              </p>
+            )}
             {board.error && (
               <p className="notice">
                 <span className="notice-mark" aria-hidden>
@@ -78,7 +98,9 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
             </div>
           </div>
 
-          <Countdown startsAt={board.periodStart} endsAt={board.periodEnd} upcoming={upcoming} />
+          {!board.idle && (
+            <Countdown startsAt={board.periodStart} endsAt={board.periodEnd} upcoming={upcoming} />
+          )}
         </div>
       </section>
 
@@ -87,7 +109,12 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
           <h2 className="h2" id="standings-h">
             Standings
           </h2>
-          {upcoming ? (
+          {board.idle ? (
+            <p className="feed">
+              <span className="feed-dot" aria-hidden />
+              {last ? 'Final results' : 'Between races'}
+            </p>
+          ) : upcoming ? (
             <p className="feed">
               <span className="feed-dot" aria-hidden />
               Opens {dayLabel(board.periodStart)}
@@ -102,10 +129,13 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
         {board.stats.players > 0 && (
           <p className="board-total" data-reveal>
             {board.stats.players.toLocaleString('en-US')} players have wagered{' '}
-            <Coin casino={casino} amount={board.stats.totalWagered} /> this race.
+            <Coin casino={casino} amount={board.stats.totalWagered} />{' '}
+            {last ? 'in the last race' : 'this race'}.
           </p>
         )}
       </section>
+
+      <PastRaces casino={casino} races={earlier} />
 
       {casino.steps && (
         <section className="section wrap" id="how" aria-labelledby="how-h">
