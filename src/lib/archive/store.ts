@@ -6,6 +6,7 @@ import path from 'node:path';
 import { get, list, put } from '@vercel/blob';
 
 import type { ArchivedRace, CasinoId, Leaderboard } from '../types';
+import { SEED_RACES } from './seed';
 
 /**
  * Where finished races are kept.
@@ -135,8 +136,9 @@ export async function hasRace(casino: CasinoId, id: string) {
   return (await keys(`races/${casino}/`)).includes(raceKey(casino, id));
 }
 
-export async function getRace(casino: CasinoId, id: string) {
-  return readJson<ArchivedRace>(raceKey(casino, id));
+export async function getRace(casino: CasinoId, id: string): Promise<ArchivedRace | null> {
+  const stored = archiveMode() === 'off' ? null : await readJson<ArchivedRace>(raceKey(casino, id));
+  return stored ?? SEED_RACES.find((r) => r.casinoId === casino && r.id === id) ?? null;
 }
 
 export async function getSnapshot(casino: CasinoId, id: string) {
@@ -148,12 +150,16 @@ export async function snapshotIds(casino: CasinoId) {
   return (await keys(`snapshots/${casino}/`)).map((k) => k.slice(k.lastIndexOf('/') + 1, -5));
 }
 
-/** Every finished race for a casino, newest first. */
+/**
+ * Every finished race for a casino, newest first: the kept ones plus the
+ * seeded ones from before the archive existed (a kept copy of a race wins).
+ */
 export async function listRaces(casino: CasinoId): Promise<ArchivedRace[]> {
-  if (archiveMode() === 'off') return [];
-  const found = await keys(`races/${casino}/`);
-  const races = await Promise.all(found.map((k) => readJson<ArchivedRace>(k)));
-  return races
-    .filter((r): r is ArchivedRace => r !== null)
-    .sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
+  const found = archiveMode() === 'off' ? [] : await keys(`races/${casino}/`);
+  const stored = (await Promise.all(found.map((k) => readJson<ArchivedRace>(k)))).filter(
+    (r): r is ArchivedRace => r !== null,
+  );
+  const ids = new Set(stored.map((r) => r.id));
+  const seeded = SEED_RACES.filter((r) => r.casinoId === casino && !ids.has(r.id));
+  return [...stored, ...seeded].sort((a, b) => Date.parse(b.start) - Date.parse(a.start));
 }
