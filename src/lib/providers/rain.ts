@@ -49,13 +49,13 @@ function avatarOf(p: RainParticipant): string | null {
 export const rainProvider: LeaderboardProvider = {
   casinoId: 'rain',
 
-  async fetchLeaderboard(): Promise<Leaderboard> {
+  async fetchLeaderboard({ fresh = false } = {}): Promise<Leaderboard> {
     const key = process.env.RAIN_API_KEY;
     if (!key) throw new Error('RAIN_API_KEY is not set');
 
     const res = await fetch(`${ENDPOINT}?participant_count=50`, {
       headers: { 'x-api-key': key, accept: 'application/json' },
-      next: { revalidate: REVALIDATE_SECONDS },
+      ...(fresh ? { cache: 'no-store' as const } : { next: { revalidate: REVALIDATE_SECONDS } }),
     });
     if (!res.ok) throw new Error(`Rain races responded ${res.status}`);
 

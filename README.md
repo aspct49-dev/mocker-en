@@ -82,9 +82,11 @@ Entries arrive as `{ user: { username, avatarUrl }, wagered: "12.34", … }`;
 the reader also accepts other common names, and if an entry matches none it
 shows "temporarily unavailable" and logs the fields it got.
 
-**Watch:** the endpoint is "applicants", and its `from`/`to` may filter by
-signup date rather than by when wagers happened. If players who joined before
-a race never appear in it, that is why.
+`from`/`to` filter the wagers themselves (checked: a player's wager for 2–3
+Nov is less than for 2–16 Nov, and players who joined earlier still show in
+later windows). The list has every sign-up, most at $0, so the board counts
+only those who wagered. `totalCount` is not used: Unbox reports 0 on the
+empty page past the end; a short page ends the list.
 
 Usernames are masked (`D*****K`) in `providers/shared.ts`, so a new provider
 cannot forget to.

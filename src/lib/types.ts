@@ -93,7 +93,11 @@ export interface Leaderboard {
 /** What a casino integration implements. Adding a casino = adding one of these. */
 export interface LeaderboardProvider {
   readonly casinoId: CasinoId;
-  fetchLeaderboard(): Promise<Leaderboard>;
+  /**
+   * `fresh` skips the data cache. The live board reads through the cache; the
+   * archive job must not, or it keeps whatever was cached during the race.
+   */
+  fetchLeaderboard(options?: { fresh?: boolean }): Promise<Leaderboard>;
 }
 
 /** One casino's offer under the code, shown on /bonuses. */

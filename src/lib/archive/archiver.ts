@@ -37,6 +37,12 @@ import {
 const SETTLE_MS = 30 * 60_000;
 /** How many finished Unbox races to look back over for any not yet kept. */
 const BACKFILL = 12;
+/**
+ * For this long after an Unbox race ends it is fetched again on every run and
+ * kept over the last copy: wagers can be credited late, and a copy kept
+ * before then would otherwise stand for good.
+ */
+const REFRESH_MS = 3 * 86_400_000;
 
 export async function runArchive(now = Date.now()): Promise<string[]> {
   const report: string[] = [];
@@ -47,7 +53,7 @@ export async function runArchive(now = Date.now()): Promise<string[]> {
 
   // --- Rain: snapshot the running race, then keep any that have finished ---
   try {
-    const board = await rainProvider.fetchLeaderboard();
+    const board = await rainProvider.fetchLeaderboard({ fresh: true });
     await saveSnapshot(toArchived(board, false));
     note(`rain: snapshot of ${raceId(board.periodStart)} saved`);
   } catch (err) {
@@ -72,11 +78,12 @@ export async function runArchive(now = Date.now()): Promise<string[]> {
     const end = start + length;
     if (now < end + SETTLE_MS) continue;
     const id = raceId(new Date(start).toISOString());
-    if (await hasRace('unbox', id)) continue;
+    const recent = now < end + REFRESH_MS;
+    if (!recent && (await hasRace('unbox', id))) continue;
     try {
-      const board = await fetchUnboxWindow(new Date(start), new Date(end));
+      const board = await fetchUnboxWindow(new Date(start), new Date(end), { fresh: true });
       await saveRace(toArchived(board, true));
-      note(`unbox: race ${id} kept`);
+      note(`unbox: race ${id} ${recent ? 'kept (refreshed while recent)' : 'kept'}`);
     } catch (err) {
       note(`unbox: race ${id} failed — ${(err as Error).message}`);
     }

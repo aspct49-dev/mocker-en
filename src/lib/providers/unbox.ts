@@ -78,7 +78,11 @@ function toPlayer(entry: Entry): RawPlayer {
  * Standings for any race window — the current race for the live board, or a
  * finished one when the archive keeps it after it ends.
  */
-export async function fetchUnboxWindow(start: Date, end: Date): Promise<Leaderboard> {
+export async function fetchUnboxWindow(
+  start: Date,
+  end: Date,
+  { fresh = false }: { fresh?: boolean } = {},
+): Promise<Leaderboard> {
   const casino = getCasino('unbox');
   const prizes = casino.fallbackPrizes;
   const base = {
@@ -100,7 +104,6 @@ export async function fetchUnboxWindow(start: Date, end: Date): Promise<Leaderbo
   // Every page, so the totals under the board count every player and not
   // just the first thirty.
   const list: Entry[] = [];
-  let totalCount = 0;
   for (let page = 0; page < MAX_PAGES; page++) {
     const url = new URL(ENDPOINT);
     url.searchParams.set('token', token);
@@ -114,15 +117,16 @@ export async function fetchUnboxWindow(start: Date, end: Date): Promise<Leaderbo
 
     const res = await fetch(url, {
       headers: { accept: 'application/json' },
-      next: { revalidate: REVALIDATE_SECONDS },
+      ...(fresh ? { cache: 'no-store' as const } : { next: { revalidate: REVALIDATE_SECONDS } }),
     });
     if (!res.ok) throw new Error(`Unbox responded ${res.status}`);
 
     const body = (await res.json()) as { totalCount?: number; list?: Entry[] };
     const rows = body.list ?? [];
-    totalCount = body.totalCount ?? totalCount;
     list.push(...rows);
-    if (rows.length < PAGE || list.length >= totalCount) break;
+    // A short page ends the list. totalCount is not used: Unbox reports 0 on
+    // the empty page past the end, and it counts every sign-up, not wagers.
+    if (rows.length < PAGE) break;
   }
 
   const ranked = list
@@ -134,7 +138,8 @@ export async function fetchUnboxWindow(start: Date, end: Date): Promise<Leaderbo
     ...base,
     entries: buildEntries(ranked, prizes),
     stats: {
-      players: Math.max(totalCount, ranked.length),
+      // Players who wagered: Unbox lists every sign-up, most at $0.
+      players: ranked.length,
       totalWagered: ranked.reduce((sum, p) => sum + p.wagered, 0),
     },
   };
@@ -143,8 +148,8 @@ export async function fetchUnboxWindow(start: Date, end: Date): Promise<Leaderbo
 export const unboxProvider: LeaderboardProvider = {
   casinoId: 'unbox',
 
-  async fetchLeaderboard(): Promise<Leaderboard> {
+  async fetchLeaderboard({ fresh = false } = {}): Promise<Leaderboard> {
     const { start, end } = scheduledPeriod(getCasino('unbox').schedule!);
-    return fetchUnboxWindow(start, end);
+    return fetchUnboxWindow(start, end, { fresh });
   },
 };
