@@ -4,7 +4,7 @@
  * from.
  */
 
-export type CasinoId = 'rain' | 'unbox' | 'gamdom';
+export type CasinoId = 'rain' | 'gamdom';
 
 export interface Casino {
   id: CasinoId;
@@ -45,8 +45,6 @@ export interface Casino {
   clockNote?: string;
   /** How prizes are paid, under the switcher. Defaults to "{name} coins". */
   paidIn?: string;
-  /** Which art flanks the podium. Defaults to Rain's coins and stars. */
-  flank?: 'rain' | 'unbox';
   /**
    * A recurring race set on this site rather than by the operator: the first
    * race starts at `anchor` (ISO) and each lasts `days`, back to back.

@@ -96,9 +96,9 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
               </p>
             )}
             <div className="podium-stage">
-              <PodiumFlank side="left" variant={casino.flank} />
+              <PodiumFlank side="left" />
               <Podium board={board} casino={casino} />
-              <PodiumFlank side="right" variant={casino.flank} />
+              <PodiumFlank side="right" />
             </div>
           </div>
 

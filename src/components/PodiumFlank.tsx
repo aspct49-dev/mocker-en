@@ -1,5 +1,5 @@
 import { CoinMark } from './CoinArt';
-import { Diamond, Sparkle } from './icons';
+import { Sparkle } from './icons';
 
 /**
  * The display around the podium: a spill of Rain coins and Rain stars on
@@ -39,32 +39,18 @@ const EMBERS: Record<Side, Ember[]> = {
   ],
 };
 
-/**
- * `variant` picks the coin and the spark beside it: Rain's coin and star, or
- * Unbox's violet dollar coin and a diamond from its mark. Sparks and embers
- * take the board's `--coin` colour, so they match the coin on show.
- */
-export function PodiumFlank({
-  side,
-  variant = 'rain',
-}: {
-  side: Side;
-  variant?: 'rain' | 'unbox';
-}) {
-  // Rain's star is Rain's mark, so it only appears on Rain's board.
-  const Spark = variant === 'unbox' ? Diamond : Sparkle;
-
+export function PodiumFlank({ side }: { side: Side }) {
   return (
-    <div className="flank" data-side={side} data-variant={variant} aria-hidden>
+    <div className="flank" data-side={side} aria-hidden>
       <span className="flank-glow" />
 
-      <CoinMark id={`${side}-far`} variant={variant} className="flank-coin flank-coin-far" />
-      <CoinMark id={`${side}-mid`} variant={variant} className="flank-coin flank-coin-mid" />
-      <CoinMark id={`${side}-near`} variant={variant} className="flank-coin flank-coin-near" />
+      <CoinMark id={`${side}-far`} className="flank-coin flank-coin-far" />
+      <CoinMark id={`${side}-mid`} className="flank-coin flank-coin-mid" />
+      <CoinMark id={`${side}-near`} className="flank-coin flank-coin-near" />
 
-      <Spark className="flank-star flank-star-lit" />
-      <Spark className="flank-star flank-star-dim" />
-      <Spark className="flank-star flank-star-tiny" />
+      <Sparkle className="flank-star flank-star-lit" />
+      <Sparkle className="flank-star flank-star-dim" />
+      <Sparkle className="flank-star flank-star-tiny" />
 
       {EMBERS[side].map(([x, y, len, rot, op], i) => (
         <span

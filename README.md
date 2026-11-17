@@ -1,7 +1,7 @@
 # Mocker-EN — community leaderboards
 
-Wager leaderboards for the Mocker-EN community. The Rain.gg board (`/`) and the
-Unbox.gg board (`/unbox`) are on this site. The Gamdom board is run on [Mocker Rewards](https://mockerrewards.com):
+Wager leaderboards for the Mocker-EN community. The Rain.gg board (`/`) is on
+this site. The Gamdom board is run on [Mocker Rewards](https://mockerrewards.com):
 its tab links to `/gamdom`, which 307-redirects there.
 
 Next.js 15 (App Router) · React 19 · TypeScript. No CSS framework — two
@@ -18,7 +18,6 @@ npm run dev                  # http://localhost:3000
 | Variable | What it is |
 |---|---|
 | `RAIN_API_KEY` | Rain.gg affiliate key, sent as `x-api-key`. Server-only. |
-| `UNBOX_TOKEN` | Unbox.gg affiliate token, sent as `?token=`. Server-only. |
 | `NEXT_PUBLIC_SITE_URL` | Canonical origin. Optional on Vercel. |
 
 ## Deploying to Vercel
@@ -32,7 +31,6 @@ npm run dev                  # http://localhost:3000
    | Variable | Value |
    |---|---|
    | `RAIN_API_KEY` | The Rain.gg affiliate API key. |
-   | `UNBOX_TOKEN` | The Unbox.gg affiliate token. |
    | `CRON_SECRET` | Any long random string; guards the archive job. |
    | `NEXT_PUBLIC_SITE_URL` | Your final origin, e.g. `https://mocker-en.com`. Optional. |
 
@@ -64,35 +62,6 @@ seat as open with `fallbackPrizes` from `src/lib/casinos.ts` and a "temporarily
 unavailable" notice. It never shows sample rows. Keep `fallbackPrizes` in step
 with the race on Rain.
 
-### Unbox.gg
-
-`src/lib/providers/unbox.ts` reads Unbox's public affiliate applicants
-endpoint for the current race. The race is ours, set in `src/lib/casinos.ts`:
-
-- `schedule` — back-to-back 14-day races from Mon 2 Nov 2026, 00:00 UTC
-  (05:30 IST). Move `anchor` to shift every race; the next one starts the
-  moment the last ends, with no deploy.
-- `pausedAt` — **the board is paused from 17 Nov 2026.** While it is set, no
-  race runs, Unbox is not asked, the page shows the last finished race (2–16
-  Nov) with a "paused" note and no countdown, How it works or Rules, and
-  races ending after it are not kept. Delete the line to resume; races carry
-  on from `schedule` (move `anchor` to restart on a chosen day).
-- `fallbackPrizes` — $500 / $250 / $100 / $75 / $50 / $25, which is $1,000.
-  The headline pool is summed from it.
-
-Unbox rejects `take` above 30, so the provider reads 30 at a time until it has
-every player (up to 300), and caches for five minutes.
-
-Entries arrive as `{ user: { username, avatarUrl }, wagered: "12.34", … }`;
-the reader also accepts other common names, and if an entry matches none it
-shows "temporarily unavailable" and logs the fields it got.
-
-`from`/`to` filter the wagers themselves (checked: a player's wager for 2–3
-Nov is less than for 2–16 Nov, and players who joined earlier still show in
-later windows). The list has every sign-up, most at $0, so the board counts
-only those who wagered. `totalCount` is not used: Unbox reports 0 on the
-empty page past the end; a short page ends the list.
-
 Usernames are masked (`D*****K`) in `providers/shared.ts`, so a new provider
 cannot forget to.
 
@@ -110,16 +79,13 @@ to `.archive/` (gitignored), so the whole flow can be tried without Vercel.
 **How they are kept:** `/api/archive` (`src/lib/archive/archiver.ts`), run by
 Vercel Cron once a day at 23:50 UTC (`vercel.json`):
 
-- **Unbox** races are ours, so a finished fortnight is fetched whole from
-  Unbox after it ends and kept. Missed ones are filled in, up to twelve back.
-- **Rain** only reports the race that is running, so its standings are kept
+Rain only reports the race that is running, so its standings are kept
   as a snapshot — by the cron, and by the board itself on every refresh in a
   race's last six hours — and the last snapshot becomes the result once the
   race has been over for 30 minutes. The race's page says when its standings
   were last read.
 
-**Starting the next race:** Unbox's starts by itself the moment the last
-ends (`schedule`). Rain's are created on Rain; its API cannot create one.
+**Starting the next race:** Rain's are created on Rain; its API cannot create one.
 Between Rain races the board shows the last race's final results with a note
 that the next one is coming, not "temporarily unavailable". To have Rain
 start each race itself, set the race to recur in Rain's dashboard.
@@ -190,9 +156,8 @@ Petch (body and every figure, tabular numerals), per the ui-ux-pro-max
 gaming/esports pairing. Its suggested purple palette was not used — the brand
 art decides colour.
 
-The podium is flanked by a display of the casino's coins and sparks
-(`components/PodiumFlank.tsx`: Rain's coin and star on Rain's board, Unbox's
-violet dollar coin and a diamond from its mark on Unbox's), tucked partly behind the outer cards, with
+The podium is flanked by a display of Rain coins and Rain stars
+(`components/PodiumFlank.tsx`), tucked partly behind the outer cards, with
 depth from size, blur and opacity. All of it is drawn in SVG and CSS, so it is
 sharp at any width, and it is static. It shrinks at tablet widths and is
 hidden once the cards stack on a phone.
@@ -220,7 +185,6 @@ src/
   app/
     layout.tsx       fonts, metadata, nav and footer
     page.tsx         the Rain.gg leaderboard
-    unbox/           the Unbox.gg leaderboard
     past/            a finished race's final standings
     api/archive/     the archive job (Vercel Cron)
     bonuses/         the bonuses page

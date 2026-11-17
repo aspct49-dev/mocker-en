@@ -82,7 +82,7 @@ async function readJson<T>(key: string): Promise<T | null> {
   return JSON.parse(await new Response(result.stream).text()) as T;
 }
 
-/** Keys under `prefix`, e.g. `races/unbox/`. */
+/** Keys under `prefix`, e.g. `races/rain/`. */
 async function keys(prefix: string): Promise<string[]> {
   if (archiveMode() === 'local') {
     try {
