@@ -26,7 +26,7 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
   // results rather than empty seats; it then leaves the past row so it is not
   // shown twice.
   const last = current.idle ? past[0] : undefined;
-  const board = last ? { ...archivedToBoard(last), idle: true } : current;
+  const board = last ? { ...archivedToBoard(last), idle: true, paused: current.paused } : current;
   const earlier = last ? past.slice(1) : past;
   const live = board.source === 'live';
   const [logoW, logoH] = casino.logoSize;
@@ -78,8 +78,12 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
                   i
                 </span>
                 {last
-                  ? `No race is running right now. These are the final results of the last race, ${rangeLabel(last.start, last.end)}. The next one starts soon.`
-                  : 'No race is running right now. The next one starts soon.'}
+                  ? board.paused
+                    ? `The ${casino.name} leaderboard is paused. These are the final results of the last race, ${rangeLabel(last.start, last.end)}.`
+                    : `No race is running right now. These are the final results of the last race, ${rangeLabel(last.start, last.end)}. The next one starts soon.`
+                  : board.paused
+                    ? `The ${casino.name} leaderboard is paused.`
+                    : 'No race is running right now. The next one starts soon.'}
               </p>
             )}
             {board.error && (
@@ -112,7 +116,7 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
           {board.idle ? (
             <p className="feed">
               <span className="feed-dot" aria-hidden />
-              {last ? 'Final results' : 'Between races'}
+              {last ? 'Final results' : board.paused ? 'Paused' : 'Between races'}
             </p>
           ) : upcoming ? (
             <p className="feed">
@@ -137,7 +141,7 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
 
       <PastRaces casino={casino} races={earlier} />
 
-      {casino.steps && (
+      {casino.steps && !board.paused && (
         <section className="section wrap" id="how" aria-labelledby="how-h">
           <div className="section-head" data-reveal>
             <h2 className="h2" id="how-h">
@@ -167,7 +171,7 @@ export async function LeaderboardView({ casinoId }: { casinoId: CasinoId }) {
         </section>
       )}
 
-      {casino.rules && (
+      {casino.rules && !board.paused && (
         <section className="section wrap" id="rules" aria-labelledby="rules-h">
           <div className="section-head" data-reveal>
             <h2 className="h2" id="rules-h">

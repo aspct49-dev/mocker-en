@@ -48,6 +48,11 @@ function emptyBoard(casinoId: CasinoId, error: string): Leaderboard {
 export async function getLeaderboard(casinoId: CasinoId): Promise<Leaderboard> {
   const provider = PROVIDERS[casinoId];
   if (!provider) return emptyBoard(casinoId, 'No provider');
+  // Paused: no race runs, so the operator is not asked at all.
+  const { pausedAt } = getCasino(casinoId);
+  if (pausedAt && Date.now() >= Date.parse(pausedAt)) {
+    return { ...emptyBoard(casinoId, ''), error: undefined, idle: true, paused: true };
+  }
   try {
     const board = await provider.fetchLeaderboard();
     keepNearTheEnd(board);
@@ -88,4 +93,3 @@ function keepNearTheEnd(board: Leaderboard) {
     // job's own snapshot covers it.
   }
 }
-

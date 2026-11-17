@@ -72,6 +72,11 @@ endpoint for the current race. The race is ours, set in `src/lib/casinos.ts`:
 - `schedule` — back-to-back 14-day races from Mon 2 Nov 2026, 00:00 UTC
   (05:30 IST). Move `anchor` to shift every race; the next one starts the
   moment the last ends, with no deploy.
+- `pausedAt` — **the board is paused from 17 Nov 2026.** While it is set, no
+  race runs, Unbox is not asked, the page shows the last finished race (2–16
+  Nov) with a "paused" note and no countdown, How it works or Rules, and
+  races ending after it are not kept. Delete the line to resume; races carry
+  on from `schedule` (move `anchor` to restart on a chosen day).
 - `fallbackPrizes` — $500 / $250 / $100 / $75 / $50 / $25, which is $1,000.
   The headline pool is summed from it.
 

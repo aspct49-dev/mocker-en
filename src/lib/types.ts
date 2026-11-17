@@ -52,6 +52,12 @@ export interface Casino {
    * race starts at `anchor` (ISO) and each lasts `days`, back to back.
    */
   schedule?: { anchor: string; days: number };
+  /**
+   * Set to pause the board from that instant (ISO): no race runs, the
+   * operator is not asked, and races ending after it are not kept. The page
+   * shows the last finished race. Remove it to resume.
+   */
+  pausedAt?: string;
 }
 
 export interface LeaderboardEntry {
@@ -86,6 +92,8 @@ export interface Leaderboard {
    * the page shows the last race's final results instead of empty seats.
    */
   idle?: boolean;
+  /** The board is paused on this site (`pausedAt`), not just between races. */
+  paused?: boolean;
   /** Set when the live call failed and an empty board was served instead. */
   error?: string;
 }

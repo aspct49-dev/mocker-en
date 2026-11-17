@@ -70,6 +70,9 @@ export const CASINOS: Record<CasinoId, Casino> = {
     // Back-to-back two-week races from Mon 2 Nov 2026, 00:00 UTC. Move the
     // anchor to shift every race; change `days` to change their length.
     schedule: { anchor: '2026-11-02T00:00:00.000Z', days: 14 },
+    // Paused from 17 Nov 2026: the 16–30 Nov race does not run. Delete this
+    // line to resume; races then carry on from the schedule above.
+    pausedAt: '2026-11-17T00:00:00.000Z',
     coinColor: '#8b7bff',
     flank: 'unbox',
     paidIn: 'dollars on Unbox.gg',

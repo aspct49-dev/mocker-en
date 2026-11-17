@@ -77,6 +77,9 @@ export async function runArchive(now = Date.now()): Promise<string[]> {
     if (start < Date.parse(schedule.anchor)) break;
     const end = start + length;
     if (now < end + SETTLE_MS) continue;
+    // A race cut short by a pause did not run to its end; it is not kept.
+    const { pausedAt } = getCasino('unbox');
+    if (pausedAt && end > Date.parse(pausedAt)) continue;
     const id = raceId(new Date(start).toISOString());
     const recent = now < end + REFRESH_MS;
     if (!recent && (await hasRace('unbox', id))) continue;

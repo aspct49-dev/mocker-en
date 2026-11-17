@@ -34,8 +34,13 @@ export function SiteNav() {
   const links = [
     { label: 'Leaderboard', href: `${base}#board`, current: Boolean(board) },
     { label: 'Bonuses', href: '/bonuses', current: pathname === '/bonuses' },
-    { label: 'How it works', href: `${base}#how`, current: false },
-    { label: 'Rules', href: `${base}#rules`, current: false },
+    // A paused board has no race to enter or rules to read.
+    ...(casino.pausedAt
+      ? []
+      : [
+          { label: 'How it works', href: `${base}#how`, current: false },
+          { label: 'Rules', href: `${base}#rules`, current: false },
+        ]),
   ];
 
   useEffect(() => {
