@@ -6,6 +6,7 @@ import { archiveMode, saveSnapshot, toArchived } from '../archive/store';
 import { getCasino } from '../casinos';
 import { currentMonth, scheduledPeriod } from '../format';
 import { rainProvider } from '../providers/rain';
+import { unboxProvider } from '../providers/unbox';
 import { buildEntries, NoActiveRaceError } from '../providers/shared';
 import type { CasinoId, Leaderboard, LeaderboardProvider } from '../types';
 
@@ -16,6 +17,7 @@ import type { CasinoId, Leaderboard, LeaderboardProvider } from '../types';
  */
 const PROVIDERS: Partial<Record<CasinoId, LeaderboardProvider>> = {
   rain: rainProvider,
+  unbox: unboxProvider,
 };
 
 /**
@@ -74,6 +76,7 @@ const FINAL_HOURS = 6;
  * caught before it ends. In a race's last hours, every fresh read of the board
  * (at most every ten minutes, the page's cache) also saves a snapshot, after
  * the response is sent; the archive job keeps the last one as the result.
+ * Races scheduled here (Unbox) are fetched whole after they end instead.
  */
 function keepNearTheEnd(board: Leaderboard) {
   if (getCasino(board.casinoId).schedule || archiveMode() === 'off') return;

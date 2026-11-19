@@ -195,6 +195,14 @@ a.switch-tab:hover {
 .switch-logo[data-casino='gamdom'] {
   height: 26px;
 }
+/* Unbox's mark leads with a tall icon and small lettering, so it needs more
+   height than the wordmarks either side to read at the same weight. */
+.switch-logo[data-casino='unbox'] {
+  height: 34px;
+}
+.hero-partner[data-casino='unbox'] {
+  width: clamp(160px, 17vw, 210px);
+}
 /* Three tabs on a phone: the marks shrink so each fits its third. */
 @media (max-width: 520px) {
   .switch-tab {
@@ -206,6 +214,9 @@ a.switch-tab:hover {
   }
   .switch-logo[data-casino='gamdom'] {
     height: 18px;
+  }
+  .switch-logo[data-casino='unbox'] {
+    height: 24px;
   }
 }
 .switch-tab[aria-current='page'] .switch-logo,
@@ -496,6 +507,17 @@ a.switch-tab:hover .switch-ext {
   width: 15cqi;
   opacity: 0.55;
   filter: blur(1.6px);
+}
+
+/* The right flank is the left one mirrored. Rain's coin and star are
+   symmetrical, so it does not show; Unbox's dollar sign would read backwards,
+   so its coins are flipped back. */
+.flank[data-side='right'][data-variant='unbox'] .flank-coin {
+  scale: -1 1;
+}
+/* Unbox's diamonds are smaller than Rain's stars at the same slot. */
+.flank[data-variant='unbox'] .flank-star {
+  scale: 0.7;
 }
 
 .flank-star {

@@ -1,7 +1,10 @@
 import 'server-only';
 
+import { getCasino } from '../casinos';
+import { scheduledPeriod } from '../format';
 import { rainProvider } from '../providers/rain';
 import { NoActiveRaceError } from '../providers/shared';
+import { fetchUnboxWindow } from '../providers/unbox';
 import {
   getSnapshot,
   hasRace,
@@ -15,16 +18,31 @@ import {
 /**
  * Keeps every finished race, run by the cron job (`/api/archive`).
  *
- * Rain runs its own races, and its API only ever shows the one that is
- * running. So each run keeps the running race's latest standings as a
- * snapshot (the board also does this itself in a race's last hours), and once
- * a race has been over for SETTLE_MS its last snapshot becomes the result.
+ * Two kinds of race, kept two ways:
  *
- * Nothing here starts a race; Rain's are created on Rain.
+ *   - **Rain** runs its own races, and its API only ever shows the one that is
+ *     running. So each run keeps the running race's latest standings as a
+ *     snapshot (the board also does this itself in a race's last hours), and
+ *     once a race has been over for SETTLE_MS its last snapshot becomes the
+ *     result.
+ *   - **Unbox** races are ours: fortnights from `schedule`. Unbox answers for
+ *     any window, so a finished race is fetched whole after it ends, and any
+ *     missed ones are filled in, up to BACKFILL races back.
+ *
+ * Nothing here starts a race. Unbox's next race begins by itself the moment
+ * the last ends; Rain's are created on Rain.
  */
 
 /** Wait this long after a race ends before keeping it, so late wagers land. */
 const SETTLE_MS = 30 * 60_000;
+/** How many finished Unbox races to look back over for any not yet kept. */
+const BACKFILL = 12;
+/**
+ * For this long after an Unbox race ends it is fetched again on every run and
+ * kept over the last copy: wagers can be credited late, and a copy kept
+ * before then would otherwise stand for good.
+ */
+const REFRESH_MS = 3 * 86_400_000;
 
 export async function runArchive(now = Date.now()): Promise<string[]> {
   const report: string[] = [];
@@ -48,6 +66,30 @@ export async function runArchive(now = Date.now()): Promise<string[]> {
     if (await hasRace('rain', id)) continue;
     await saveRace(snap);
     note(`rain: race ${id} kept (standings as of ${snap.takenAt})`);
+  }
+
+  // --- Unbox: fetch and keep each finished fortnight not kept yet ---
+  const schedule = getCasino('unbox').schedule!;
+  const length = schedule.days * 86_400_000;
+  const current = scheduledPeriod(schedule, new Date(now));
+  for (let k = 1; k <= BACKFILL; k++) {
+    const start = current.start.getTime() - k * length;
+    if (start < Date.parse(schedule.anchor)) break;
+    const end = start + length;
+    if (now < end + SETTLE_MS) continue;
+    // A race cut short by a pause did not run to its end; it is not kept.
+    const { pausedAt } = getCasino('unbox');
+    if (pausedAt && end > Date.parse(pausedAt)) continue;
+    const id = raceId(new Date(start).toISOString());
+    const recent = now < end + REFRESH_MS;
+    if (!recent && (await hasRace('unbox', id))) continue;
+    try {
+      const board = await fetchUnboxWindow(new Date(start), new Date(end), { fresh: true });
+      await saveRace(toArchived(board, true));
+      note(`unbox: race ${id} ${recent ? 'kept (refreshed while recent)' : 'kept'}`);
+    } catch (err) {
+      note(`unbox: race ${id} failed — ${(err as Error).message}`);
+    }
   }
 
   return report;

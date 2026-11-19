@@ -3,13 +3,14 @@
  *
  *   `rain` — Rain's coin: gold, with its star stamped in the face.
  *   `cash` — a mint coin with a dollar sign, in Gamdom's colour.
+ *   `unbox` — Unbox.gg's violet coin with a white dollar sign.
  *
  * Each has a darker edge drawn under the face for thickness. Gradient ids
  * take an `id` prefix, so any number of coins can share a page without two
  * sharing a definition.
  */
 
-type Variant = 'rain' | 'cash';
+type Variant = 'rain' | 'cash' | 'unbox';
 
 const PALETTE: Record<
   Variant,
@@ -40,6 +41,16 @@ const PALETTE: Record<
     faceB: '#3dffa0',
     ring: '#00b85f',
     glyph: '#005c2c',
+  },
+  // Unbox.gg's coin: violet, with a white dollar sign.
+  unbox: {
+    edge: '#3a169e',
+    rimTop: '#a48cff',
+    rimBottom: '#6828f0',
+    faceA: '#6a2cf2',
+    faceB: '#8c5cff',
+    ring: '#5320d4',
+    glyph: '#ececf4',
   },
 };
 
